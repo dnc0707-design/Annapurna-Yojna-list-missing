@@ -451,9 +451,10 @@
             let reasonHTML = '';
             if (isAdminLoggedIn) {
                 // Admin View: Editable textarea
+                const buttonText = (app.adminReason && app.adminReason.trim() !== '') ? 'Update Remark' : 'Save Remark';
                 reasonHTML = `
                     <textarea id="reason_${index}" class="admin-textarea" placeholder="Enter admin remark...">${app.adminReason}</textarea>
-                    <button class="save-btn" onclick="saveAdminReason(${index})">Save Remark</button>
+                    <button class="save-btn" onclick="saveAdminReason(${index})">${buttonText}</button>
                 `;
             } else {
                 // Public View: Plain text or "Pending"
@@ -478,9 +479,20 @@
     // Save Admin Reason
     window.saveAdminReason = function(index) {
         const reasonValue = document.getElementById(`reason_${index}`).value;
+        const isUpdate = (applications[index].adminReason && applications[index].adminReason.trim() !== '');
+        
         applications[index].adminReason = reasonValue;
         localStorage.setItem('annapurnaAppsV2', JSON.stringify(applications));
-        showToast(`Remark saved for Application ID: ${applications[index].id}`);
+        
+        const actionWord = isUpdate ? 'updated' : 'saved';
+        showToast(`Remark ${actionWord} for Application ID: ${applications[index].id}`);
+        
+        // Update button text locally without refreshing the whole table 
+        // to prevent interrupting the admin if they are typing in other rows
+        const btn = document.querySelector(`button[onclick="saveAdminReason(${index})"]`);
+        if (btn) {
+            btn.innerText = (reasonValue.trim() !== '') ? 'Update Remark' : 'Save Remark';
+        }
     };
 
     // Initial render call
