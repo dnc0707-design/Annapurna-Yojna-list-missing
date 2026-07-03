@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Annapurna Bhandar - Missing list update</title>
+    <title>Annapurna Yojna - Missing list update</title>
 
     <!-- Export Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -333,7 +333,7 @@
 <body>
 
 <div class="header">
-    <h1>Annapurna Bhandar</h1>
+    <h1>Annapurna Yojna</h1>
     <div class="header-actions">
         <button id="exportExcelBtn" class="export-btn" onclick="exportToExcel()">Download Excel</button>
         <button id="exportPdfBtn" class="export-btn pdf" onclick="exportToPDF()">Download PDF</button>
@@ -347,7 +347,8 @@
 <div class="container">
     <!-- FORM SECTION -->
     <div class="card" id="formCard">
-        <h2>Annapurna Bhandar Missing list update for SANTURI BLOCK - <br>
+        <h2>Annapurna Yojna Missing list update for SANTURI BLOCK - <br>
+            <span style="color: var(--primary-color); font-size: 0.9em; display: block; margin-top: 8px;">অন্নপূর্ণা যোজনা নাম মিসিং লিস্ট আপডেট</span>
             <span style="font-size: 0.7em; color: var(--danger-color); font-weight: normal; display: block; margin-top: 5px;">
                 ( * this is survey site only )<br>
                 ( * This is not a govt website )
@@ -387,7 +388,7 @@
                 </div>
             </div>
             
-            <button type="submit" class="submit-btn">Submit Application</button>
+            <button type="submit" class="submit-btn">Submit Query</button>
         </form>
     </div>
 
@@ -402,6 +403,7 @@
             <table id="dataTable">
                 <thead>
                     <tr>
+                        <th class="sortable" onclick="handleSort('timestamp')">Date <span id="sort_timestamp" class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('id')">App ID <span id="sort_id" class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('name')">Beneficiary Name <span id="sort_name" class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('panchayat')">Panchayat <span id="sort_panchayat" class="sort-icon"></span></th>
@@ -578,12 +580,13 @@
         });
 
         if (filteredApps.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color:#666;">No applications found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:#666;">No applications found.</td></tr>';
             return;
         }
 
         filteredApps.forEach((app) => {
             const tr = document.createElement('tr');
+            const submitDate = app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A';
             let reasonHTML = '';
             if (isAdminLoggedIn) {
                 const buttonText = (app.adminReason && app.adminReason.trim() !== '') ? 'Update Remark' : 'Save Remark';
@@ -598,11 +601,12 @@
                 if (app.adminReason && app.adminReason.trim() !== '') {
                     reasonHTML = `<span style="font-weight: 500;">${app.adminReason}</span>`;
                 } else {
-                    reasonHTML = `<span class="pending-text">Pending Admin Review</span>`;
+                    reasonHTML = `<span class="pending-text">-</span>`;
                 }
             }
 
             tr.innerHTML = `
+                <td>${submitDate}</td>
                 <td><strong>${app.id}</strong></td>
                 <td>${app.name}</td>
                 <td>${app.panchayat}</td>
@@ -616,6 +620,7 @@
     window.exportToExcel = function() {
         if(applications.length === 0) return window.showToast("No data to export", "error");
         const data = applications.map(app => ({
+            "Date": app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A',
             "Application ID": app.id,
             "Beneficiary Name": app.name,
             "Panchayat": app.panchayat,
@@ -625,28 +630,28 @@
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Applications");
-        XLSX.writeFile(wb, "Annapurna_Bhandar_List.xlsx");
+        XLSX.writeFile(wb, "Annapurna_Yojna_List.xlsx");
     };
 
     window.exportToPDF = function() {
         if(applications.length === 0) return window.showToast("No data to export", "error");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.text("Annapurna Bhandar Missing List - Santuri Block", 14, 15);
-        const tableColumn = ["App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
+        doc.text("Annapurna Yojna Missing List - Santuri Block", 14, 15);
+        const tableColumn = ["Date", "App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
         const tableRows = applications.map(app => [
-            app.id, app.name, app.panchayat, app.block, app.adminReason || "Pending Admin Review"
+            app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A', app.id, app.name, app.panchayat, app.block, app.adminReason || "Pending Admin Review"
         ]);
         doc.autoTable({
             head: [tableColumn], body: tableRows, startY: 20, styles: { fontSize: 9 }, headStyles: { fillColor: [0, 86, 179] }
         });
-        doc.save("Annapurna_Bhandar_List.pdf");
+        doc.save("Annapurna_Yojna_List.pdf");
     };
 
     /* =========================================================================
        2. DATABASE INITIALIZATION (FIREBASE SAFE SETUP)
        ========================================================================= */
-    const APP_COLLECTION_PATH = typeof __app_id !== 'undefined' ? __app_id : 'annapurna-bhandar-portal';
+    const APP_COLLECTION_PATH = typeof __app_id !== 'undefined' ? __app_id : 'annapurna-yojna-portal';
     
     // NOTE FOR GITHUB: If you host this on GitHub, the default DB config is missing.
     // If you want data to save to a cloud database, create a Firebase project,
@@ -711,6 +716,11 @@
             });
         } catch (error) {
             console.error("Auth error:", error);
+            if (error.code === 'auth/operation-not-allowed') {
+                setTimeout(() => window.showToast("CRITICAL: Enable 'Anonymous' sign-in in Firebase Console -> Authentication", "error"), 2000);
+            } else {
+                setTimeout(() => window.showToast("Auth Error: " + error.message, "error"), 2000);
+            }
         }
     }
 
@@ -720,8 +730,12 @@
     document.getElementById('applicationForm').onsubmit = async function(e) {
         e.preventDefault();
         
-        if (!dbReady || !currentUser) {
-            window.showToast("Error: Database is disconnected. Cannot save.", "error");
+        if (!dbReady) {
+            window.showToast("Error: Database configuration is missing or invalid.", "error");
+            return;
+        }
+        if (!currentUser) {
+            window.showToast("Error: Authentication failed. Please check Firebase Anonymous Sign-in.", "error");
             return;
         }
         
