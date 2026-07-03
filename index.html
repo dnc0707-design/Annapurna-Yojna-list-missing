@@ -11,605 +11,81 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root {
-            --primary-color: #0056b3;
-            --bg-color: #f4f7f6;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --text-dark: #333;
-            --text-light: #666;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-        }
-        
-        /* Header & Navigation */
-        .header {
-            background-color: #fff;
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: var(--primary-color);
-        }
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .export-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-            display: none; /* Hidden by default, visible to admin */
-        }
-        .export-btn:hover { background-color: #218838; }
-        .export-btn.pdf { background-color: #dc3545; }
-        .export-btn.pdf:hover { background-color: #c82333; }
-        
-        .admin-login-btn {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .admin-login-btn:hover { background-color: #5a6268; }
-        .logout-btn { background-color: var(--danger-color); }
-        .logout-btn:hover { background-color: #c82333; }
-
-        /* Main Container */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 20px 40px 20px;
-        }
-
-        /* Form Card */
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-        .card h2 {
-            margin-top: 0;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            color: var(--text-dark);
-        }
-
-        /* Form Elements */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
-        }
+        :root { --primary-color: #0056b3; --bg-color: #f4f7f6; --success-color: #28a745; --danger-color: #dc3545; --text-dark: #333; --text-light: #666; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-dark); }
+        .header { background-color: #fff; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 24px; color: var(--primary-color); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
+        .card { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .form-group { margin-bottom: 15px; }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #444;
-        }
-        input[type="text"], select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        input[readonly] {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-            color: #666;
-        }
-        .submit-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        .submit-btn:hover { background-color: #004494; }
-        .error-msg {
-            color: var(--danger-color);
-            font-size: 14px;
-            display: none;
-            margin-top: 5px;
-        }
-
-        /* Table Styles */
-        .table-responsive {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: #fff;
-        }
-        th, td {
-            border: 1px solid #e0e0e0;
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: var(--primary-color);
-            color: white;
-            white-space: nowrap;
-        }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        
-        .admin-textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: vertical;
-            min-height: 50px;
-            box-sizing: border-box;
-        }
-        .save-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 13px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 5px;
-            display: block;
-            width: 100%;
-        }
-        .save-btn:hover { background-color: #218838; }
-        .pending-text {
-            color: var(--text-light);
-            font-weight: bold;
-        }
-
-        /* Search, Sort & Actions Styles */
-        .search-bar {
-            width: 100%;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        .sortable {
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.2s;
-        }
-        .sortable:hover {
-            background-color: #004494;
-        }
-        .sort-icon {
-            font-size: 0.8em;
-            margin-left: 5px;
-            opacity: 0.7;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-        }
-        .delete-btn {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 13px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .delete-btn:hover { background-color: #c82333; }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .modal-content h3 { margin-top: 0; }
-        .close-modal {
-            float: right;
-            cursor: pointer;
-            font-size: 20px;
-            color: #888;
-        }
-        .close-modal:hover { color: #333; }
-
-        /* Confirmation Details Box */
-        .confirm-details {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-            border: 1px solid #eee;
-        }
-        .confirm-details p {
-            margin: 5px 0;
-            font-size: 15px;
-        }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn-cancel {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 50%;
-            font-weight: bold;
-        }
-        .btn-cancel:hover { background-color: #5a6268; }
-        .btn-confirm {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 50%;
-            font-weight: bold;
-        }
-        .btn-confirm:hover { background-color: #004494; }
-
-        /* Toast Notification */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
-        }
-        .toast {
-            background-color: #333;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s, transform 0.3s;
-            display: none;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-            display: block;
-        }
-        .toast.success { background-color: var(--success-color); }
-        .toast.error { background-color: var(--danger-color); }
+        input[type="text"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .submit-btn { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; width: 100%; cursor: pointer; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; }
+        th, td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+        th { background-color: var(--primary-color); color: white; }
+        .admin-textarea { width: 100%; padding: 8px; border: 1px solid #ccc; }
+        .save-btn { background-color: var(--success-color); color: white; border: none; padding: 6px; cursor: pointer; }
+        .delete-btn { background-color: var(--danger-color); color: white; border: none; padding: 6px; cursor: pointer; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 400px; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>Annapurna Yojna</h1>
-    <div class="header-actions">
-        <button id="exportExcelBtn" class="export-btn" onclick="exportToExcel()">Download Excel</button>
-        <button id="exportPdfBtn" class="export-btn pdf" onclick="exportToPDF()">Download PDF</button>
-        <button id="authBtn" class="admin-login-btn" onclick="openLoginModal()">Admin Login</button>
+    <div>
+        <button id="adminBtn" onclick="openLoginModal()">Admin Login</button>
     </div>
 </div>
 
-<!-- Toast Notifications -->
-<div class="toast-container" id="toastContainer"></div>
-
 <div class="container">
-    <!-- FORM SECTION -->
     <div class="card" id="formCard">
-        <h2>Annapurna Yojna Missing list update for SANTURI BLOCK - <br>
-            <span style="color: var(--primary-color); font-size: 0.9em; display: block; margin-top: 8px;">অন্নপূর্ণা যোজনা নাম মিসিং লিস্ট</span>
-            <span style="font-size: 0.7em; color: var(--danger-color); font-weight: normal; display: block; margin-top: 5px;">
-                ( * this is survey site only )<br>
-                ( * This is not a govt website )
-            </span>
-        </h2>
-        <p style="color: var(--text-light); margin-bottom: 20px;">For beneficiaries not listed in the July 1, 2026 publication.</p>
-        
+        <h2>Annapurna Yojna Missing list Query</h2>
         <form id="applicationForm">
             <div class="form-grid">
-                <div class="form-group">
-                    <label for="submitDate">Application submission date <span style="color:red;">*</span></label>
-                    <input type="date" id="submitDate" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="appId">Application ID <span style="color:red;">*</span></label>
-                    <input type="text" id="appId" required placeholder="Enter unique Application ID">
-                    <div id="idError" class="error-msg">This Application ID already exists!</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="appName">Beneficiary Name <span style="color:red;">*</span></label>
-                    <input type="text" id="appName" required placeholder="Enter full name">
-                </div>
-
-                <div class="form-group">
-                    <label for="panchayat">Panchayat <span style="color:red;">*</span></label>
+                <div class="form-group"><label>Date <span style="color:red;">*</span></label><input type="date" id="submitDate" required></div>
+                <div class="form-group"><label>App ID <span style="color:red;">*</span></label><input type="text" id="appId" required></div>
+                <div class="form-group"><label>Name <span style="color:red;">*</span></label><input type="text" id="appName" required></div>
+                <div class="form-group"><label>Panchayat <span style="color:red;">*</span></label>
                     <select id="panchayat" required>
-                        <option value="">-- Select Panchayat --</option>
-                        <option value="Santuri">Santuri</option>
-                        <option value="RCPur-Kotaldi">RCPur-Kotaldi</option>
-                        <option value="Balitora">Balitora</option>
-                        <option value="Tarabari">Tarabari</option>
-                        <option value="Muradi">Muradi</option>
-                        <option value="Garshika">Garshika</option>
+                        <option value="">-- Select --</option>
+                        <option value="Santuri">Santuri</option><option value="RCPur-Kotaldi">RCPur-Kotaldi</option>
+                        <option value="Balitora">Balitora</option><option value="Tarabari">Tarabari</option>
+                        <option value="Muradi">Muradi</option><option value="Garshika">Garshika</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label for="block">Block</label>
-                    <input type="text" id="block" value="Santuri" readonly>
-                </div>
+                <div class="form-group"><label>Block</label><input type="text" id="block" value="Santuri" readonly></div>
             </div>
-            
-            <button type="submit" class="submit-btn">Submit Query</button>
+            <button type="submit" class="submit-btn">Submit</button>
         </form>
     </div>
 
-    <!-- PUBLIC LIST SECTION -->
     <div class="card">
-        <h2>Application Status List</h2>
-        <p style="color: var(--text-light); margin-bottom: 15px;">List of all submitted applications and official remarks.</p>
-        
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search by App ID, Name, or Panchayat..." onkeyup="handleSearch()">
-
-        <div class="table-responsive">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="sortable" onclick="handleSort('timestamp')">Date <span id="sort_timestamp" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('id')">App ID <span id="sort_id" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('name')">Beneficiary Name <span id="sort_name" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('panchayat')">Panchayat <span id="sort_panchayat" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('block')">Block <span id="sort_block" class="sort-icon"></span></th>
-                        <th class="sortable" style="width: 35%;" onclick="handleSort('adminReason')">Admin remark for current status <span id="sort_adminReason" class="sort-icon"></span></th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Data populated via JS -->
-                </tbody>
-            </table>
-        </div>
+        <h2>List</h2>
+        <input type="text" id="searchInput" placeholder="Search..." onkeyup="renderTable()" style="width:100%; padding:10px; margin-bottom:10px;">
+        <table>
+            <thead><tr><th>Date</th><th>ID</th><th>Name</th><th>Panchayat</th><th>Status/Remark</th></tr></thead>
+            <tbody id="tableBody"><tr><td colspan="5">Loading data...</td></tr></tbody>
+        </table>
     </div>
 </div>
 
-<!-- Confirmation Modal -->
-<div class="modal-overlay" id="confirmModal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeConfirmModal()">&times;</span>
-        <h3 style="color: var(--primary-color);">Confirm Details</h3>
-        <p>Please review your information before submitting:</p>
-        <div class="confirm-details">
-            <p><strong>Date:</strong> <span id="confirmDate"></span></p>
-            <p><strong>App ID:</strong> <span id="confirmId"></span></p>
-            <p><strong>Name:</strong> <span id="confirmName"></span></p>
-            <p><strong>Panchayat:</strong> <span id="confirmPanchayat"></span></p>
-            <p><strong>Block:</strong> <span id="confirmBlock"></span></p>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeConfirmModal()">Edit Details</button>
-            <button class="btn-confirm" id="finalSubmitBtn" onclick="executeSubmission()">Confirm & Submit</button>
-        </div>
-    </div>
-</div>
-
-<!-- Admin Login Modal -->
 <div class="modal-overlay" id="loginModal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeLoginModal()">&times;</span>
         <h3>Admin Login</h3>
-        <div class="form-group" style="margin-top: 15px;">
-            <label for="adminId">User ID</label>
-            <input type="text" id="adminId" placeholder="Enter Admin ID">
-        </div>
-        <div class="form-group">
-            <label for="adminPass">Password</label>
-            <input type="password" id="adminPass" placeholder="Enter Password">
-            <div id="loginError" class="error-msg">Incorrect ID or Password!</div>
-        </div>
-        <button class="submit-btn" onclick="attemptLogin()">Login</button>
+        <input type="password" id="adminPass" placeholder="Password">
+        <button onclick="attemptLogin()" style="margin-top:10px;">Login</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    /* =========================================================================
-       1. STATE MANAGEMENT & UI FUNCTIONS
-       ========================================================================= */
-    let applications = [];
-    let isAdminLoggedIn = false;
-    let currentSearch = '';
-    let currentSort = { column: 'timestamp', order: 'desc' };
-    let dbReady = false;
-    const APP_COLLECTION_PATH = 'annapurna-yojna-portal';
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const dateInput = document.getElementById('submitDate');
-        if (dateInput) {
-            const today = new Date();
-            const offset = today.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(today - offset)).toISOString().split('T')[0];
-            dateInput.value = localISOTime;
-        }
-    });
-
-    window.showToast = function(message, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerText = message;
-        container.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    };
-
-    window.openLoginModal = function() {
-        if (isAdminLoggedIn) {
-            isAdminLoggedIn = false;
-            document.getElementById('authBtn').innerText = "Admin Login";
-            document.getElementById('authBtn').classList.remove('logout-btn');
-            document.getElementById('exportExcelBtn').style.display = 'none';
-            document.getElementById('exportPdfBtn').style.display = 'none';
-            document.getElementById('formCard').style.display = 'block';
-            window.showToast("Admin logged out successfully.");
-            window.renderTable();
-        } else {
-            document.getElementById('loginModal').style.display = 'flex';
-        }
-    };
-
-    window.closeLoginModal = function() { document.getElementById('loginModal').style.display = 'none'; };
-
-    window.attemptLogin = function() {
-        const pass = document.getElementById('adminPass').value;
-        const userId = document.getElementById('adminId').value.trim();
-        if (pass === 'santuri123') {
-            isAdminLoggedIn = true;
-            window.closeLoginModal();
-            document.getElementById('authBtn').innerText = "Logout Admin";
-            document.getElementById('authBtn').classList.add('logout-btn');
-            document.getElementById('exportExcelBtn').style.display = 'inline-block';
-            document.getElementById('exportPdfBtn').style.display = 'inline-block';
-            document.getElementById('formCard').style.display = 'none';
-            window.showToast("Admin logged in successfully!");
-            window.renderTable();
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-        }
-    };
-
-    window.closeConfirmModal = function() { document.getElementById('confirmModal').style.display = 'none'; };
-
-    window.handleSearch = function() {
-        currentSearch = document.getElementById('searchInput').value.toLowerCase();
-        window.renderTable();
-    };
-
-    window.handleSort = function(column) {
-        if (currentSort.column === column) {
-            currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
-        } else {
-            currentSort.column = column;
-            currentSort.order = 'asc';
-        }
-        window.renderTable();
-    };
-
-    window.renderTable = function() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        let filteredApps = applications.filter(app => {
-            return (app.id && app.id.toLowerCase().includes(currentSearch)) ||
-                   (app.name && app.name.toLowerCase().includes(currentSearch)) ||
-                   (app.panchayat && app.panchayat.toLowerCase().includes(currentSearch));
-        });
-
-        filteredApps.sort((a, b) => {
-            let valA = a[currentSort.column] || '';
-            let valB = b[currentSort.column] || '';
-            if (typeof valA === 'string') valA = valA.toLowerCase();
-            if (typeof valB === 'string') valB = valB.toLowerCase();
-            if (valA < valB) return currentSort.order === 'asc' ? -1 : 1;
-            if (valA > valB) return currentSort.order === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        filteredApps.forEach((app) => {
-            const tr = document.createElement('tr');
-            const submitDate = app.formDate || (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A');
-            let reasonHTML = '';
-            
-            if (isAdminLoggedIn) {
-                const buttonText = (app.adminReason && app.adminReason.trim() !== '') ? 'Update Remark' : 'Save Remark';
-                reasonHTML = `
-                    <textarea id="reason_${app.dbId}" class="admin-textarea" placeholder="Enter admin remark...">${app.adminReason || ''}</textarea>
-                    <div class="action-buttons">
-                        <button class="save-btn" onclick="saveAdminReason('${app.dbId}')">${buttonText}</button>
-                        <button class="delete-btn" onclick="deleteApplication('${app.dbId}')">Delete</button>
-                    </div>
-                `;
-            } else {
-                if (app.adminReason && app.adminReason.trim() !== '') {
-                    reasonHTML = `<span style="font-weight: 500;">${app.adminReason}</span>`;
-                } else {
-                    reasonHTML = `<span class="pending-text">-</span>`;
-                }
-            }
-
-            tr.innerHTML = `
-                <td>${submitDate}</td>
-                <td><strong>${app.id || 'N/A'}</strong></td>
-                <td>${app.name || 'N/A'}</td>
-                <td>${app.panchayat || 'N/A'}</td>
-                <td>${app.block || 'N/A'}</td>
-                <td>${reasonHTML}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    };
-
-    /* =========================================================================
-       2. DATABASE INITIALIZATION
-       ========================================================================= */
-    const myFirebaseConfig = {
+    const firebaseConfig = {
         apiKey: "AIzaSyCEPlnsWfKqr7akfKXrLE6zJhfBVjdUb3Q",
         authDomain: "annapurna-bhandar-9d9ae.firebaseapp.com",
         projectId: "annapurna-bhandar-9d9ae",
@@ -618,70 +94,98 @@
         appId: "1:472903565913:web:d379e28809fdecbf20e748"
     };
 
-    let app, auth, db, currentUser = null;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
     
-    try {
-        app = initializeApp(myFirebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-        dbReady = true;
+    let applications = [];
+    let isAdmin = false;
+
+    // Initialize
+    signInAnonymously(auth).then(() => {
+        // Fetch from ALL locations
+        const paths = [
+            'annapurna_submissions',
+            'artifacts/annapurna-yojna-portal/public/data/applications'
+        ];
+
+        paths.forEach(path => {
+            onSnapshot(collection(db, path), (snapshot) => {
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    // Merge into main array, avoid duplicates by ID
+                    const existingIdx = applications.findIndex(a => a.id === (data.id || docSnap.id));
+                    if(existingIdx > -1) {
+                        applications[existingIdx] = { dbId: docSnap.id, ...data };
+                    } else {
+                        applications.push({ dbId: docSnap.id, ...data });
+                    }
+                });
+                renderTable();
+            });
+        });
+    });
+
+    window.renderTable = function() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
         
-        signInAnonymously(auth).then(userCred => {
-            currentUser = userCred.user;
-            
-            // Listen to main submissions
-            onSnapshot(collection(db, 'annapurna_submissions'), (snapshot) => {
-                snapshot.forEach(docSnap => {
-                    const existingIdx = applications.findIndex(a => a.dbId === docSnap.id);
-                    const data = { dbId: docSnap.id, ...docSnap.data() };
-                    if(existingIdx > -1) applications[existingIdx] = data;
-                    else applications.push(data);
-                });
-                window.renderTable();
-            });
-
-            // Listen to nested path
-            const nestedRef = collection(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications');
-            onSnapshot(nestedRef, (snapshot) => {
-                snapshot.forEach(docSnap => {
-                    const existingIdx = applications.findIndex(a => a.dbId === docSnap.id);
-                    const data = { dbId: docSnap.id, ...docSnap.data() };
-                    if(existingIdx > -1) applications[existingIdx] = data;
-                    else applications.push(data);
-                });
-                window.renderTable();
-            });
+        applications.filter(a => (a.name || '').toLowerCase().includes(query) || (a.id || '').includes(query)).forEach(app => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${app.formDate || app.date || 'N/A'}</td>
+                <td>${app.id || 'N/A'}</td>
+                <td>${app.name || 'N/A'}</td>
+                <td>${app.panchayat || 'N/A'}</td>
+                <td>
+                    ${isAdmin ? 
+                        `<textarea id="rem_${app.dbId}">${app.adminReason || ''}</textarea>
+                         <button class="save-btn" onclick="saveRemark('${app.dbId}')">Save</button>
+                         <button class="delete-btn" onclick="del('${app.dbId}')">Del</button>` 
+                        : (app.adminReason || 'Pending')}
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
-    } catch(e) { console.error(e); }
-
-    window.saveAdminReason = async function(dbId) {
-        const val = document.getElementById(`reason_${dbId}`).value;
-        const docRef = doc(db, 'annapurna_submissions', dbId);
-        await updateDoc(docRef, { adminReason: val }).catch(async () => {
-            await updateDoc(doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId), { adminReason: val });
-        });
-        window.showToast("Remark saved!");
     };
 
-    window.deleteApplication = async function(dbId) {
-        await deleteDoc(doc(db, 'annapurna_submissions', dbId)).catch(async () => {
-            await deleteDoc(doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId));
-        });
-        window.showToast("Deleted!");
+    window.attemptLogin = () => {
+        if(document.getElementById('adminPass').value === 'santuri123') {
+            isAdmin = true;
+            document.getElementById('loginModal').style.display = 'none';
+            renderTable();
+        } else { alert("Wrong Password"); }
     };
 
-    document.getElementById('applicationForm').onsubmit = async function(e) {
+    window.openLoginModal = () => document.getElementById('loginModal').style.display = 'flex';
+
+    window.saveRemark = async (dbId) => {
+        const val = document.getElementById('rem_'+dbId).value;
+        const app = applications.find(a => a.dbId === dbId);
+        // Save to submissions folder
+        await updateDoc(doc(db, 'annapurna_submissions', dbId), { adminReason: val });
+        alert("Saved!");
+    };
+
+    window.del = async (dbId) => {
+        if(confirm("Delete?")) {
+            await deleteDoc(doc(db, 'annapurna_submissions', dbId));
+        }
+    };
+
+    document.getElementById('applicationForm').onsubmit = async (e) => {
         e.preventDefault();
-        const id = document.getElementById('appId').value.trim();
+        const id = document.getElementById('appId').value;
         await setDoc(doc(db, 'annapurna_submissions', id), {
             id: id,
             name: document.getElementById('appName').value,
             panchayat: document.getElementById('panchayat').value,
-            block: document.getElementById('block').value,
             formDate: document.getElementById('submitDate').value,
+            block: 'Santuri',
             timestamp: Date.now()
         });
-        window.showToast("Submitted!");
+        alert("Submitted!");
         document.getElementById('applicationForm').reset();
     };
 </script>
