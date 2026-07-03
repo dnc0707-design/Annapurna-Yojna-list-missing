@@ -403,7 +403,6 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th class="sortable" onclick="handleSort('timestamp')">Date <span id="sort_timestamp" class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('id')">App ID <span id="sort_id" class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('name')">Beneficiary Name <span id="sort_name" class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('panchayat')">Panchayat <span id="sort_panchayat" class="sort-icon"></span></th>
@@ -580,14 +579,14 @@
         });
 
         if (filteredApps.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:#666;">No applications found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color:#666;">No applications found.</td></tr>';
             return;
         }
 
         filteredApps.forEach((app) => {
             const tr = document.createElement('tr');
-            const submitDate = app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A';
             let reasonHTML = '';
+            
             if (isAdminLoggedIn) {
                 const buttonText = (app.adminReason && app.adminReason.trim() !== '') ? 'Update Remark' : 'Save Remark';
                 reasonHTML = `
@@ -606,7 +605,6 @@
             }
 
             tr.innerHTML = `
-                <td>${submitDate}</td>
                 <td><strong>${app.id}</strong></td>
                 <td>${app.name}</td>
                 <td>${app.panchayat}</td>
@@ -620,7 +618,6 @@
     window.exportToExcel = function() {
         if(applications.length === 0) return window.showToast("No data to export", "error");
         const data = applications.map(app => ({
-            "Date": app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A',
             "Application ID": app.id,
             "Beneficiary Name": app.name,
             "Panchayat": app.panchayat,
@@ -638,9 +635,9 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.text("Annapurna Yojna Missing List - Santuri Block", 14, 15);
-        const tableColumn = ["Date", "App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
+        const tableColumn = ["App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
         const tableRows = applications.map(app => [
-            app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A', app.id, app.name, app.panchayat, app.block, app.adminReason || "Reason not given yet"
+            app.id, app.name, app.panchayat, app.block, app.adminReason || "Reason not given yet"
         ]);
         doc.autoTable({
             head: [tableColumn], body: tableRows, startY: 20, styles: { fontSize: 9 }, headStyles: { fillColor: [0, 86, 179] }
