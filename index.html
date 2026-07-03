@@ -1,1725 +1,834 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Annapurna Yojna - Missing list update</title>
 
-
-
     <!-- Export Libraries -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-
-
     <style>
-
         :root {
-
             --primary-color: #0056b3;
-
             --bg-color: #f4f7f6;
-
             --success-color: #28a745;
-
             --danger-color: #dc3545;
-
             --text-dark: #333;
-
             --text-light: #666;
-
         }
-
         body {
-
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
             background-color: var(--bg-color);
-
             margin: 0;
-
             padding: 0;
-
             color: var(--text-dark);
-
         }
-
         
-
         /* Header & Navigation */
-
         .header {
-
             background-color: #fff;
-
             padding: 15px 30px;
-
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
-
             margin-bottom: 30px;
-
         }
-
         .header h1 {
-
             margin: 0;
-
             font-size: 24px;
-
             color: var(--primary-color);
-
         }
-
         .header-actions {
-
             display: flex;
-
             gap: 10px;
-
         }
-
         .export-btn {
-
             background-color: var(--success-color);
-
             color: white;
-
             border: none;
-
             padding: 8px 16px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             font-weight: bold;
-
             transition: background 0.3s;
-
             display: none; /* Hidden by default, visible to admin */
-
         }
-
         .export-btn:hover { background-color: #218838; }
-
         .export-btn.pdf { background-color: #dc3545; }
-
         .export-btn.pdf:hover { background-color: #c82333; }
-
         
-
         .admin-login-btn {
-
             background-color: #6c757d;
-
             color: white;
-
             border: none;
-
             padding: 8px 16px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             font-weight: bold;
-
             transition: background 0.3s;
-
         }
-
         .admin-login-btn:hover { background-color: #5a6268; }
-
         .logout-btn { background-color: var(--danger-color); }
-
         .logout-btn:hover { background-color: #c82333; }
 
-
-
         /* Main Container */
-
         .container {
-
             max-width: 1000px;
-
             margin: 0 auto;
-
             padding: 0 20px 40px 20px;
-
         }
-
-
 
         /* Form Card */
-
         .card {
-
             background: #ffffff;
-
             padding: 30px;
-
             border-radius: 8px;
-
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-
             margin-bottom: 30px;
-
         }
-
         .card h2 {
-
             margin-top: 0;
-
             border-bottom: 2px solid var(--primary-color);
-
             padding-bottom: 10px;
-
             color: var(--text-dark);
-
         }
-
-
 
         /* Form Elements */
-
         .form-grid {
-
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
             gap: 20px;
-
         }
-
         @media (max-width: 600px) {
-
             .form-grid { grid-template-columns: 1fr; }
-
         }
-
         .form-group { margin-bottom: 15px; }
-
         label {
-
             display: block;
-
             font-weight: 600;
-
             margin-bottom: 5px;
-
             color: #444;
-
         }
-
         input[type="text"], select, textarea {
-
             width: 100%;
-
             padding: 10px;
-
             border: 1px solid #ccc;
-
             border-radius: 4px;
-
             box-sizing: border-box;
-
             font-size: 16px;
-
         }
-
         input[readonly] {
-
             background-color: #e9ecef;
-
             cursor: not-allowed;
-
             color: #666;
-
         }
-
         .submit-btn {
-
             background-color: var(--primary-color);
-
             color: white;
-
             border: none;
-
             padding: 12px 20px;
-
             font-size: 16px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             width: 100%;
-
             margin-top: 10px;
-
             font-weight: bold;
-
         }
-
         .submit-btn:hover { background-color: #004494; }
-
         .error-msg {
-
             color: var(--danger-color);
-
             font-size: 14px;
-
             display: none;
-
             margin-top: 5px;
-
         }
-
-
 
         /* Table Styles */
-
         .table-responsive {
-
             overflow-x: auto;
-
         }
-
         table {
-
             width: 100%;
-
             border-collapse: collapse;
-
             margin-top: 10px;
-
             background: #fff;
-
         }
-
         th, td {
-
             border: 1px solid #e0e0e0;
-
             padding: 12px;
-
             text-align: left;
-
         }
-
         th {
-
             background-color: var(--primary-color);
-
             color: white;
-
             white-space: nowrap;
-
         }
-
         tr:nth-child(even) { background-color: #f9f9f9; }
-
         
-
         .admin-textarea {
-
             width: 100%;
-
             padding: 8px;
-
             border: 1px solid #ccc;
-
             border-radius: 4px;
-
             resize: vertical;
-
             min-height: 50px;
-
             box-sizing: border-box;
-
         }
-
         .save-btn {
-
             background-color: var(--success-color);
-
             color: white;
-
             border: none;
-
             padding: 6px 12px;
-
             font-size: 13px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             margin-top: 5px;
-
             display: block;
-
             width: 100%;
-
         }
-
         .save-btn:hover { background-color: #218838; }
-
         .pending-text {
-
             color: var(--text-light);
-
             font-style: italic;
-
         }
-
-
 
         /* Search, Sort & Actions Styles */
-
         .search-bar {
-
             width: 100%;
-
             padding: 10px 15px;
-
             margin-bottom: 15px;
-
             border: 1px solid #ccc;
-
             border-radius: 4px;
-
             box-sizing: border-box;
-
             font-size: 16px;
-
         }
-
         .sortable {
-
             cursor: pointer;
-
             user-select: none;
-
             transition: background-color 0.2s;
-
         }
-
         .sortable:hover {
-
             background-color: #004494;
-
         }
-
         .sort-icon {
-
             font-size: 0.8em;
-
             margin-left: 5px;
-
             opacity: 0.7;
-
         }
-
         .action-buttons {
-
             display: flex;
-
             gap: 5px;
-
             margin-top: 5px;
-
         }
-
         .delete-btn {
-
             background-color: var(--danger-color);
-
             color: white;
-
             border: none;
-
             padding: 6px 12px;
-
             font-size: 13px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             width: 100%;
-
         }
-
         .delete-btn:hover { background-color: #c82333; }
 
-
-
         /* Modal Styles */
-
         .modal-overlay {
-
             position: fixed;
-
             top: 0; left: 0; width: 100%; height: 100%;
-
             background: rgba(0,0,0,0.5);
-
             display: none;
-
             justify-content: center;
-
             align-items: center;
-
             z-index: 1000;
-
         }
-
         .modal-content {
-
             background: white;
-
             padding: 30px;
-
             border-radius: 8px;
-
             width: 90%;
-
             max-width: 400px;
-
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-
         }
-
         .modal-content h3 { margin-top: 0; }
-
         .close-modal {
-
             float: right;
-
             cursor: pointer;
-
             font-size: 20px;
-
             color: #888;
-
         }
-
         .close-modal:hover { color: #333; }
 
-
-
         /* Confirmation Details Box */
-
         .confirm-details {
-
             background: #f9f9f9;
-
             padding: 15px;
-
             border-radius: 4px;
-
             margin: 15px 0;
-
             border: 1px solid #eee;
-
         }
-
         .confirm-details p {
-
             margin: 5px 0;
-
             font-size: 15px;
-
         }
-
         .modal-actions {
-
             display: flex;
-
             gap: 10px;
-
             margin-top: 20px;
-
         }
-
         .btn-cancel {
-
             background-color: #6c757d;
-
             color: white;
-
             border: none;
-
             padding: 10px 15px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             width: 50%;
-
             font-weight: bold;
-
         }
-
         .btn-cancel:hover { background-color: #5a6268; }
-
         .btn-confirm {
-
             background-color: var(--primary-color);
-
             color: white;
-
             border: none;
-
             padding: 10px 15px;
-
             border-radius: 4px;
-
             cursor: pointer;
-
             width: 50%;
-
             font-weight: bold;
-
         }
-
         .btn-confirm:hover { background-color: #004494; }
 
-
-
         /* Toast Notification */
-
         .toast-container {
-
             position: fixed;
-
             bottom: 20px;
-
             right: 20px;
-
             z-index: 1001;
-
         }
-
         .toast {
-
             background-color: #333;
-
             color: white;
-
             padding: 12px 20px;
-
             border-radius: 4px;
-
             margin-top: 10px;
-
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-
             opacity: 0;
-
             transform: translateY(20px);
-
             transition: opacity 0.3s, transform 0.3s;
-
             display: none;
-
         }
-
         .toast.show {
-
             opacity: 1;
-
             transform: translateY(0);
-
             display: block;
-
         }
-
         .toast.success { background-color: var(--success-color); }
-
         .toast.error { background-color: var(--danger-color); }
-
     </style>
-
 </head>
-
 <body>
 
-
-
 <div class="header">
-
     <h1>Annapurna Yojna</h1>
-
     <div class="header-actions">
-
         <button id="exportExcelBtn" class="export-btn" onclick="exportToExcel()">Download Excel</button>
-
         <button id="exportPdfBtn" class="export-btn pdf" onclick="exportToPDF()">Download PDF</button>
-
         <button id="authBtn" class="admin-login-btn" onclick="openLoginModal()">Admin Login</button>
-
     </div>
-
 </div>
-
-
 
 <!-- Toast Notifications -->
-
 <div class="toast-container" id="toastContainer"></div>
 
-
-
 <div class="container">
-
     <!-- FORM SECTION -->
-
     <div class="card" id="formCard">
-
         <h2>Annapurna Yojna Missing list update for SANTURI BLOCK - <br>
-
             <span style="color: var(--primary-color); font-size: 0.9em; display: block; margin-top: 8px;">অন্নপূর্ণা যোজনা নাম মিসিং লিস্ট আপডেট</span>
-
             <span style="font-size: 0.7em; color: var(--danger-color); font-weight: normal; display: block; margin-top: 5px;">
-
                 ( * this is survey site only )<br>
-
                 ( * This is not a govt website )
-
             </span>
-
         </h2>
-
         <p style="color: var(--text-light); margin-bottom: 20px;">For beneficiaries not listed in the July 1, 2026 publication.</p>
-
         
-
         <form id="applicationForm">
-
             <div class="form-grid">
-
                 <div class="form-group">
-
-                    <label for="submitDate">Application submission date <span style="color:red;">*</span></label>
-
-                    <input type="date" id="submitDate" required>
-
-                </div>
-
-
-
-                <div class="form-group">
-
                     <label for="appId">Application ID <span style="color:red;">*</span></label>
-
                     <input type="text" id="appId" required placeholder="Enter unique Application ID">
-
                     <div id="idError" class="error-msg">This Application ID already exists!</div>
-
                 </div>
 
-
-
                 <div class="form-group">
-
                     <label for="appName">Beneficiary Name <span style="color:red;">*</span></label>
-
                     <input type="text" id="appName" required placeholder="Enter full name">
-
                 </div>
 
-
-
                 <div class="form-group">
-
                     <label for="panchayat">Panchayat <span style="color:red;">*</span></label>
-
                     <select id="panchayat" required>
-
                         <option value="">-- Select Panchayat --</option>
-
                         <option value="Santuri">Santuri</option>
-
                         <option value="RCPur-Kotaldi">RCPur-Kotaldi</option>
-
                         <option value="Balitora">Balitora</option>
-
                         <option value="Tarabari">Tarabari</option>
-
                         <option value="Muradi">Muradi</option>
-
                         <option value="Garshika">Garshika</option>
-
                     </select>
-
                 </div>
-
-
 
                 <div class="form-group">
-
                     <label for="block">Block</label>
-
                     <input type="text" id="block" value="Santuri" readonly>
-
                 </div>
-
             </div>
-
             
-
             <button type="submit" class="submit-btn">Submit Query</button>
-
         </form>
-
     </div>
-
-
 
     <!-- PUBLIC LIST SECTION -->
-
     <div class="card">
-
         <h2>Application Status List</h2>
-
         <p style="color: var(--text-light); margin-bottom: 15px;">List of all submitted applications and official remarks.</p>
-
         
-
         <input type="text" id="searchInput" class="search-bar" placeholder="Search by App ID, Name, or Panchayat..." onkeyup="handleSearch()">
 
-
-
         <div class="table-responsive">
-
             <table id="dataTable">
-
                 <thead>
-
                     <tr>
-
                         <th class="sortable" onclick="handleSort('timestamp')">Date <span id="sort_timestamp" class="sort-icon"></span></th>
-
                         <th class="sortable" onclick="handleSort('id')">App ID <span id="sort_id" class="sort-icon"></span></th>
-
                         <th class="sortable" onclick="handleSort('name')">Beneficiary Name <span id="sort_name" class="sort-icon"></span></th>
-
                         <th class="sortable" onclick="handleSort('panchayat')">Panchayat <span id="sort_panchayat" class="sort-icon"></span></th>
-
                         <th class="sortable" onclick="handleSort('block')">Block <span id="sort_block" class="sort-icon"></span></th>
-
                         <th class="sortable" style="width: 35%;" onclick="handleSort('adminReason')">Admin remark for current status <span id="sort_adminReason" class="sort-icon"></span></th>
-
                     </tr>
-
                 </thead>
-
                 <tbody id="tableBody">
-
                     <!-- Data populated via JS -->
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
-
-
 
 <!-- Confirmation Modal -->
-
 <div class="modal-overlay" id="confirmModal">
-
     <div class="modal-content">
-
         <span class="close-modal" onclick="closeConfirmModal()">&times;</span>
-
         <h3 style="color: var(--primary-color);">Confirm Details</h3>
-
         <p>Please review your information before submitting:</p>
-
         <div class="confirm-details">
-
-            <p><strong>Date:</strong> <span id="confirmDate"></span></p>
-
             <p><strong>App ID:</strong> <span id="confirmId"></span></p>
-
             <p><strong>Name:</strong> <span id="confirmName"></span></p>
-
             <p><strong>Panchayat:</strong> <span id="confirmPanchayat"></span></p>
-
             <p><strong>Block:</strong> <span id="confirmBlock"></span></p>
-
         </div>
-
         <div class="modal-actions">
-
             <button class="btn-cancel" onclick="closeConfirmModal()">Edit Details</button>
-
             <button class="btn-confirm" id="finalSubmitBtn" onclick="executeSubmission()">Confirm & Submit</button>
-
         </div>
-
     </div>
-
 </div>
-
-
 
 <!-- Admin Login Modal -->
-
 <div class="modal-overlay" id="loginModal">
-
     <div class="modal-content">
-
         <span class="close-modal" onclick="closeLoginModal()">&times;</span>
-
         <h3>Admin Login</h3>
-
         <div class="form-group" style="margin-top: 15px;">
-
             <label for="adminId">User ID</label>
-
             <input type="text" id="adminId" placeholder="Enter Admin ID">
-
         </div>
-
         <div class="form-group">
-
             <label for="adminPass">Password</label>
-
             <input type="password" id="adminPass" placeholder="Enter Password">
-
             <div id="loginError" class="error-msg">Incorrect ID or Password!</div>
-
         </div>
-
         <button class="submit-btn" onclick="attemptLogin()">Login</button>
-
     </div>
-
 </div>
 
-
-
 <script type="module">
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
     import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-
-
     /* =========================================================================
-
        1. STATE MANAGEMENT & UI FUNCTIONS (HOISTED FOR SAFETY)
-
        These functions are defined first so the UI buttons always work, 
-
        even if database connection fails on GitHub.
-
        ========================================================================= */
-
     let applications = [];
-
     let isAdminLoggedIn = false;
-
     let currentSearch = '';
-
     let currentSort = { column: 'timestamp', order: 'desc' };
-
     let dbReady = false;
 
-
-
-    // Auto-fill the date box with today's date
-
-    document.addEventListener('DOMContentLoaded', () => {
-
-        const dateInput = document.getElementById('submitDate');
-
-        if (dateInput) {
-
-            // Gets today's date in YYYY-MM-DD format for the input box
-
-            const today = new Date();
-
-            // Using offset to get correct local date string
-
-            const offset = today.getTimezoneOffset() * 60000;
-
-            const localISOTime = (new Date(today - offset)).toISOString().split('T')[0];
-
-            dateInput.value = localISOTime;
-
-        }
-
-    });
-
-
-
     window.showToast = function(message, type = 'success') {
-
         const container = document.getElementById('toastContainer');
-
         const toast = document.createElement('div');
-
         toast.className = `toast ${type}`;
-
         toast.innerText = message;
-
         container.appendChild(toast);
-
         setTimeout(() => toast.classList.add('show'), 10);
-
         setTimeout(() => {
-
             toast.classList.remove('show');
-
             setTimeout(() => toast.remove(), 300);
-
         }, 3000);
-
     };
-
-
 
     window.openLoginModal = function() {
-
         if (isAdminLoggedIn) {
-
             isAdminLoggedIn = false;
-
             document.getElementById('authBtn').innerText = "Admin Login";
-
             document.getElementById('authBtn').classList.remove('logout-btn');
-
             document.getElementById('exportExcelBtn').style.display = 'none';
-
             document.getElementById('exportPdfBtn').style.display = 'none';
-
             document.getElementById('formCard').style.display = 'block';
-
             window.showToast("Admin logged out successfully.");
-
             window.renderTable();
-
         } else {
-
             document.getElementById('loginModal').style.display = 'flex';
-
             document.getElementById('adminId').value = '';
-
             document.getElementById('adminPass').value = '';
-
             document.getElementById('loginError').style.display = 'none';
-
         }
-
     };
-
-
 
     window.closeLoginModal = function() {
-
         document.getElementById('loginModal').style.display = 'none';
-
     };
-
-
 
     window.attemptLogin = function() {
-
         const pass = document.getElementById('adminPass').value;
-
         const userId = document.getElementById('adminId').value.trim();
-
         
-
         if (userId === "") {
-
             document.getElementById('loginError').innerText = "User ID cannot be empty.";
-
             document.getElementById('loginError').style.display = 'block';
-
             return;
-
         }
-
-
 
         if (pass === 'santuri123') {
-
             isAdminLoggedIn = true;
-
             window.closeLoginModal();
-
             document.getElementById('authBtn').innerText = "Logout Admin";
-
             document.getElementById('authBtn').classList.add('logout-btn');
-
             document.getElementById('exportExcelBtn').style.display = 'inline-block';
-
             document.getElementById('exportPdfBtn').style.display = 'inline-block';
-
             document.getElementById('formCard').style.display = 'none';
-
             window.showToast("Admin logged in successfully!");
-
             window.renderTable(); 
-
         } else {
-
             document.getElementById('loginError').innerText = "Incorrect Password!";
-
             document.getElementById('loginError').style.display = 'block';
-
         }
-
     };
-
-
 
     window.closeConfirmModal = function() {
-
         document.getElementById('confirmModal').style.display = 'none';
-
     };
-
-
 
     window.handleSearch = function() {
-
         currentSearch = document.getElementById('searchInput').value.toLowerCase();
-
         window.renderTable();
-
     };
-
-
 
     window.handleSort = function(column) {
-
         if (currentSort.column === column) {
-
             currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
-
         } else {
-
             currentSort.column = column;
-
             currentSort.order = 'asc';
-
         }
-
         window.renderTable();
-
     };
-
-
 
     window.renderTable = function() {
-
         const tbody = document.getElementById('tableBody');
-
         tbody.innerHTML = '';
 
-
-
         document.querySelectorAll('.sort-icon').forEach(el => el.innerHTML = '');
-
         const sortIconEl = document.getElementById(`sort_${currentSort.column}`);
-
         if (sortIconEl) {
-
             sortIconEl.innerHTML = currentSort.order === 'asc' ? ' ▲' : ' ▼';
-
         }
-
-
 
         let filteredApps = applications.filter(app => {
-
             return (app.id && app.id.toLowerCase().includes(currentSearch)) ||
-
                    (app.name && app.name.toLowerCase().includes(currentSearch)) ||
-
                    (app.panchayat && app.panchayat.toLowerCase().includes(currentSearch));
-
         });
-
-
 
         filteredApps.sort((a, b) => {
-
             let valA = a[currentSort.column] || '';
-
             let valB = b[currentSort.column] || '';
-
             if (typeof valA === 'string') valA = valA.toLowerCase();
-
             if (typeof valB === 'string') valB = valB.toLowerCase();
 
-
-
             if (valA < valB) return currentSort.order === 'asc' ? -1 : 1;
-
             if (valA > valB) return currentSort.order === 'asc' ? 1 : -1;
-
             return 0;
-
         });
-
-
 
         if (filteredApps.length === 0) {
-
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:#666;">No applications found.</td></tr>';
-
             return;
-
         }
-
-
 
         filteredApps.forEach((app) => {
-
             const tr = document.createElement('tr');
-
-            const submitDate = app.formDate ? new Date(app.formDate).toLocaleDateString('en-IN') : (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A');
-
+            const submitDate = app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A';
             let reasonHTML = '';
-
             if (isAdminLoggedIn) {
-
                 const buttonText = (app.adminReason && app.adminReason.trim() !== '') ? 'Update Remark' : 'Save Remark';
-
                 reasonHTML = `
-
                     <textarea id="reason_${app.dbId}" class="admin-textarea" placeholder="Enter admin remark...">${app.adminReason || ''}</textarea>
-
                     <div class="action-buttons">
-
                         <button class="save-btn" onclick="saveAdminReason('${app.dbId}')">${buttonText}</button>
-
                         <button class="delete-btn" onclick="deleteApplication('${app.dbId}')">Delete</button>
-
                     </div>
-
                 `;
-
             } else {
-
                 if (app.adminReason && app.adminReason.trim() !== '') {
-
                     reasonHTML = `<span style="font-weight: 500;">${app.adminReason}</span>`;
-
                 } else {
-
                     reasonHTML = `<span class="pending-text">Pending Admin Review</span>`;
-
                 }
-
             }
-
-
 
             tr.innerHTML = `
-
                 <td>${submitDate}</td>
-
                 <td><strong>${app.id}</strong></td>
-
                 <td>${app.name}</td>
-
                 <td>${app.panchayat}</td>
-
                 <td>${app.block}</td>
-
                 <td>${reasonHTML}</td>
-
             `;
-
             tbody.appendChild(tr);
-
         });
-
     };
-
-
 
     window.exportToExcel = function() {
-
         if(applications.length === 0) return window.showToast("No data to export", "error");
-
         const data = applications.map(app => ({
-
-            "Date": app.formDate ? new Date(app.formDate).toLocaleDateString('en-IN') : (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A'),
-
+            "Date": app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A',
             "Application ID": app.id,
-
             "Beneficiary Name": app.name,
-
             "Panchayat": app.panchayat,
-
             "Block": app.block,
-
             "Admin Remark": app.adminReason || "Pending Admin Review"
-
         }));
-
         const ws = XLSX.utils.json_to_sheet(data);
-
         const wb = XLSX.utils.book_new();
-
         XLSX.utils.book_append_sheet(wb, ws, "Applications");
-
         XLSX.writeFile(wb, "Annapurna_Yojna_List.xlsx");
-
     };
-
-
 
     window.exportToPDF = function() {
-
         if(applications.length === 0) return window.showToast("No data to export", "error");
-
         const { jsPDF } = window.jspdf;
-
         const doc = new jsPDF();
-
         doc.text("Annapurna Yojna Missing List - Santuri Block", 14, 15);
-
         const tableColumn = ["Date", "App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
-
         const tableRows = applications.map(app => [
-
-            app.formDate ? new Date(app.formDate).toLocaleDateString('en-IN') : (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A'), app.id, app.name, app.panchayat, app.block, app.adminReason || "Pending Admin Review"
-
+            app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A', app.id, app.name, app.panchayat, app.block, app.adminReason || "Pending Admin Review"
         ]);
-
         doc.autoTable({
-
             head: [tableColumn], body: tableRows, startY: 20, styles: { fontSize: 9 }, headStyles: { fillColor: [0, 86, 179] }
-
         });
-
         doc.save("Annapurna_Yojna_List.pdf");
-
     };
-
-
 
     /* =========================================================================
-
        2. DATABASE INITIALIZATION (FIREBASE SAFE SETUP)
-
        ========================================================================= */
-
     const APP_COLLECTION_PATH = typeof __app_id !== 'undefined' ? __app_id : 'annapurna-yojna-portal';
-
     
-
     // NOTE FOR GITHUB: If you host this on GitHub, the default DB config is missing.
-
     // If you want data to save to a cloud database, create a Firebase project,
-
     // and paste the configuration keys into the empty strings below:
-
     const myFirebaseConfig = {
-
         apiKey: "AIzaSyCEPlnsWfKqr7akfKXrLE6zJhfBVjdUb3Q",
-
         authDomain: "annapurna-bhandar-9d9ae.firebaseapp.com",
-
         projectId: "annapurna-bhandar-9d9ae",
-
         storageBucket: "annapurna-bhandar-9d9ae.firebasestorage.app",
-
         messagingSenderId: "472903565913",
-
         appId: "1:472903565913:web:d379e28809fdecbf20e748",
-
         measurementId: "G-Y1D3VD5ENN"
-
     };
-
-
 
     let actualFirebaseConfig = {};
-
     if (typeof __firebase_config !== 'undefined') {
-
         try { actualFirebaseConfig = JSON.parse(__firebase_config); } catch(e) {}
-
     } else if (myFirebaseConfig.apiKey !== "") {
-
         actualFirebaseConfig = myFirebaseConfig;
-
     }
-
-
 
     let app, auth, db, currentUser = null;
-
     
-
     if (Object.keys(actualFirebaseConfig).length > 0) {
-
         try {
-
             app = initializeApp(actualFirebaseConfig);
-
             auth = getAuth(app);
-
             db = getFirestore(app);
-
             dbReady = true;
-
             initDatabase();
-
         } catch(e) {
-
             console.error("Firebase init failed:", e);
-
         }
-
     } else {
-
         console.warn("No Firebase configuration found! Data will not be saved. Add config keys if running outside the preview environment.");
-
         setTimeout(() => window.showToast("Warning: No database connected. Cloud features offline.", "error"), 1500);
-
         window.renderTable();
-
     }
-
-
 
     async function initDatabase() {
-
         try {
-
             let userCred;
-
             if (typeof __initial_auth_token !== 'undefined') {
-
                 userCred = await signInWithCustomToken(auth, __initial_auth_token);
-
             } else {
-
                 userCred = await signInAnonymously(auth);
-
             }
-
             
-
             currentUser = userCred.user;
-
             if (!currentUser) return; // Wait for authentication before proceeding
 
-
-
             const appsRef = collection(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications');
-
             onSnapshot(appsRef, (snapshot) => {
-
                 applications = [];
-
                 snapshot.forEach(docSnap => {
-
                     applications.push({ dbId: docSnap.id, ...docSnap.data() });
-
                 });
-
                 applications.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
                 window.renderTable();
-
             }, (error) => {
-
                 console.error("Firestore sync error:", error);
-
             });
-
         } catch (error) {
-
             console.error("Auth error:", error);
-
             if (error.code === 'auth/operation-not-allowed') {
-
                 setTimeout(() => window.showToast("CRITICAL: Enable 'Anonymous' sign-in in Firebase Console -> Authentication", "error"), 2000);
-
             } else {
-
                 setTimeout(() => window.showToast("Auth Error: " + error.message, "error"), 2000);
-
             }
-
         }
-
     }
 
-
-
     /* =========================================================================
-
        3. DATABASE WRITE OPERATIONS
-
        ========================================================================= */
-
     document.getElementById('applicationForm').onsubmit = async function(e) {
-
         e.preventDefault();
-
         
-
         if (!dbReady) {
-
             window.showToast("Error: Database configuration is missing or invalid.", "error");
-
             return;
-
         }
-
         if (!currentUser) {
-
             window.showToast("Error: Authentication failed. Please check Firebase Anonymous Sign-in.", "error");
-
             return;
-
         }
-
         
-
         const appIdInput = document.getElementById('appId').value.trim();
-
         const appName = document.getElementById('appName').value.trim();
-
         const panchayat = document.getElementById('panchayat').value;
-
         const block = document.getElementById('block').value;
 
-        const submitDate = document.getElementById('submitDate').value;
-
-
-
         try {
-
             const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', appIdInput);
-
             const docSnap = await getDoc(docRef);
-
             if (docSnap.exists()) {
-
                 document.getElementById('idError').style.display = 'block';
-
                 window.showToast("Application ID already exists!", "error");
-
                 return;
-
             }
-
             document.getElementById('idError').style.display = 'none';
-
             
-
-            document.getElementById('confirmDate').innerText = new Date(submitDate).toLocaleDateString('en-IN');
-
             document.getElementById('confirmId').innerText = appIdInput;
-
             document.getElementById('confirmName').innerText = appName;
-
             document.getElementById('confirmPanchayat').innerText = panchayat;
-
             document.getElementById('confirmBlock').innerText = block;
-
             document.getElementById('confirmModal').style.display = 'flex';
-
         } catch (error) {
-
             console.error("Error checking ID:", error);
-
             window.showToast("Error validating Application ID", "error");
-
         }
-
     };
-
-
 
     window.executeSubmission = async function() {
-
         if (!currentUser) return; // Prevent action if not authenticated
-
         const appIdInput = document.getElementById('appId').value.trim();
-
         const appName = document.getElementById('appName').value.trim();
-
         const panchayat = document.getElementById('panchayat').value;
-
         const block = document.getElementById('block').value;
-
-        const submitDate = document.getElementById('submitDate').value;
-
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
-
         
-
         finalSubmitBtn.disabled = true;
-
         finalSubmitBtn.innerText = "Saving...";
 
-
-
         try {
-
             const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', appIdInput);
-
             await setDoc(docRef, {
-
                 id: appIdInput,
-
                 name: appName,
-
                 panchayat: panchayat,
-
                 block: block,
-
-                formDate: submitDate,
-
                 adminReason: '', 
-
                 timestamp: Date.now()
-
             });
-
             window.showToast("Application submitted successfully!");
-
             document.getElementById('applicationForm').reset();
-
-            
-
-            // Re-apply today's date since reset clears it
-
-            const today = new Date();
-
-            const offset = today.getTimezoneOffset() * 60000;
-
-            document.getElementById('submitDate').value = (new Date(today - offset)).toISOString().split('T')[0];
-
-
-
             window.closeConfirmModal();
-
         } catch (error) {
-
             console.error("Submission error:", error);
-
             window.showToast("Failed to submit application", "error");
-
         } finally {
-
             finalSubmitBtn.disabled = false;
-
             finalSubmitBtn.innerText = "Confirm & Submit";
-
         }
-
     };
-
-
 
     window.saveAdminReason = async function(dbId) {
-
         if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
-
         const appData = applications.find(a => a.dbId === dbId);
-
         if(!appData) return;
-
         
-
         const reasonValue = document.getElementById(`reason_${dbId}`).value;
-
         const isUpdate = (appData.adminReason && appData.adminReason.trim() !== '');
-
         
-
         try {
-
             const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId);
-
             await updateDoc(docRef, { adminReason: reasonValue });
-
             const actionWord = isUpdate ? 'updated' : 'saved';
-
             window.showToast(`Remark ${actionWord} for Application ID: ${appData.id}`);
-
         } catch (error) {
-
             console.error("Error updating doc:", error);
-
             window.showToast("Error updating remark", "error");
-
         }
-
     };
-
-
 
     window.deleteApplication = async function(dbId) {
-
         if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
-
         try {
-
             const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId);
-
             await deleteDoc(docRef);
-
             window.showToast("Application deleted successfully", "success");
-
         } catch (error) {
-
             console.error("Error deleting doc:", error);
-
             window.showToast("Error deleting application", "error");
-
         }
-
     };
-
 </script>
 
-
-
 </body>
-
 </html>
