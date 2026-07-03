@@ -625,7 +625,7 @@
             "Beneficiary Name": app.name,
             "Panchayat": app.panchayat,
             "Block": app.block,
-            "Admin Remark": app.adminReason || "Pending Admin Review"
+            "Admin Remark": app.adminReason || "Reason not given yet"
         }));
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
@@ -640,7 +640,7 @@
         doc.text("Annapurna Yojna Missing List - Santuri Block", 14, 15);
         const tableColumn = ["Date", "App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
         const tableRows = applications.map(app => [
-            app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A', app.id, app.name, app.panchayat, app.block, app.adminReason || "Pending Admin Review"
+            app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A', app.id, app.name, app.panchayat, app.block, app.adminReason || "Reason not given yet"
         ]);
         doc.autoTable({
             head: [tableColumn], body: tableRows, startY: 20, styles: { fontSize: 9 }, headStyles: { fillColor: [0, 86, 179] }
