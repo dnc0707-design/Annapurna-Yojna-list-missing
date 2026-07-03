@@ -711,8 +711,23 @@
                 const unsub = onSnapshot(q, (snapshot) => {
                     let collectionDocs = [];
                     snapshot.forEach(doc => {
-                        // Store the collection path with the data so we can edit/delete it later
-                        collectionDocs.push({ docId: doc.id, _collectionPath: path, ...doc.data() });
+                        const data = doc.data();
+                        // Only add documents that look like they contain application data
+                        // and provide safe default values so old data doesn't crash the table
+                        if (data.appId || data.name || data.panchayat || data.applicationId) {
+                            collectionDocs.push({ 
+                                docId: doc.id, 
+                                _collectionPath: path,
+                                appId: data.appId || data.applicationId || 'N/A',
+                                name: data.name || data.applicantName || 'Unknown',
+                                block: data.block || 'Santuri',
+                                panchayat: data.panchayat || data.ward || '',
+                                date: data.date || '',
+                                adminRemark: data.adminRemark || '',
+                                createdAt: data.createdAt || 0,
+                                ...data 
+                            });
+                        }
                     });
                     
                     // Update this specific collection's chunk of data
@@ -846,9 +861,11 @@
             const filterBlock = document.getElementById('filterBlock').value;
             const filterPanchayat = document.getElementById('filterPanchayat').value;
 
-            // Filter Data
+            // Filter Data (With safety checks for missing fields)
             let displayData = window.allApplications.filter(app => {
-                const matchSearch = app.appId.toLowerCase().includes(search) || app.name.toLowerCase().includes(search);
+                const searchStrId = (app.appId || '').toString().toLowerCase();
+                const searchStrName = (app.name || '').toString().toLowerCase();
+                const matchSearch = searchStrId.includes(search) || searchStrName.includes(search);
                 const matchBlock = filterBlock === "All" || app.block === filterBlock;
                 const matchPanchayat = filterPanchayat === "All" || app.panchayat === filterPanchayat;
                 return matchSearch && matchBlock && matchPanchayat;
@@ -1030,8 +1047,11 @@
             const filterBlock = document.getElementById('filterBlock').value;
             const filterPanchayat = document.getElementById('filterPanchayat').value;
             
+            // Filter Data (With safety checks for missing fields)
             let exportData = window.allApplications.filter(app => {
-                const matchSearch = app.appId.toLowerCase().includes(search) || app.name.toLowerCase().includes(search);
+                const searchStrId = (app.appId || '').toString().toLowerCase();
+                const searchStrName = (app.name || '').toString().toLowerCase();
+                const matchSearch = searchStrId.includes(search) || searchStrName.includes(search);
                 const matchBlock = filterBlock === "All" || app.block === filterBlock;
                 const matchPanchayat = filterPanchayat === "All" || app.panchayat === filterPanchayat;
                 return matchSearch && matchBlock && matchPanchayat;
@@ -1060,8 +1080,11 @@
             const filterBlock = document.getElementById('filterBlock').value;
             const filterPanchayat = document.getElementById('filterPanchayat').value;
             
+            // Filter Data (With safety checks for missing fields)
             let exportData = window.allApplications.filter(app => {
-                const matchSearch = app.appId.toLowerCase().includes(search) || app.name.toLowerCase().includes(search);
+                const searchStrId = (app.appId || '').toString().toLowerCase();
+                const searchStrName = (app.name || '').toString().toLowerCase();
+                const matchSearch = searchStrId.includes(search) || searchStrName.includes(search);
                 const matchBlock = filterBlock === "All" || app.block === filterBlock;
                 const matchPanchayat = filterPanchayat === "All" || app.panchayat === filterPanchayat;
                 return matchSearch && matchBlock && matchPanchayat;
