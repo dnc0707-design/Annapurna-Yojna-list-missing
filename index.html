@@ -3,444 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Annapurna Yojna - Missing list update</title>
-
-    <!-- Export Libraries -->
+    <title>Annapurna Yojna - Missing List Query</title>
+    <!-- Include SheetJS for Excel Download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Include jsPDF and html2canvas for PDF Download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary-color: #0056b3;
-            --bg-color: #f4f7f6;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --text-dark: #333;
-            --text-light: #666;
+            --primary-color: #1e3a8a; /* Deep Sapphire Blue */
+            --primary-hover: #172554;
+            --accent-color: #3b82f6;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --warning-color: #f59e0b;
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
             color: var(--text-dark);
-        }
-        
-        /* Header & Navigation */
-        .header {
-            background-color: #fff;
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .header h1 {
             margin: 0;
-            font-size: 24px;
-            color: var(--primary-color);
+            padding: 30px 15px;
+            line-height: 1.5;
         }
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .export-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-            display: none; /* Hidden by default, visible to admin */
-        }
-        .export-btn:hover { background-color: #218838; }
-        .export-btn.pdf { background-color: #dc3545; }
-        .export-btn.pdf:hover { background-color: #c82333; }
-        
-        .admin-login-btn {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .admin-login-btn:hover { background-color: #5a6268; }
-        .logout-btn { background-color: var(--danger-color); }
-        .logout-btn:hover { background-color: #c82333; }
-
-        /* Main Container */
         .container {
-            max-width: 1000px;
+            max-width: 1050px;
             margin: 0 auto;
-            padding: 0 20px 40px 20px;
         }
-
-        /* Form Card */
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        
+        /* Typography & Headers */
+        .page-header {
+            text-align: center;
             margin-bottom: 30px;
         }
-        .card h2 {
-            margin-top: 0;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+        h2 {
+            color: var(--primary-color);
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        h3 {
             color: var(--text-dark);
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .subtitle {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+        }
+        .disclaimer {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            background: #f1f5f9;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+        .disclaimer span {
+            color: var(--danger-color);
+            font-weight: 700;
+            margin-left: 5px;
+        }
+
+        /* Cards Layout */
+        .card {
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.5);
         }
 
         /* Form Elements */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .form-group {
+            margin-bottom: 20px;
         }
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
-        }
-        .form-group { margin-bottom: 15px; }
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 5px;
-            color: #444;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 14px;
         }
-        input[type="text"], select, textarea {
+        label span { color: var(--danger-color); }
+        
+        input[type="text"], 
+        input[type="date"],
+        input[type="password"],
+        select, 
+        textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            background-color: #fff;
+            color: var(--text-dark);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
         input[readonly] {
-            background-color: #e9ecef;
+            background-color: #f1f5f9;
+            color: var(--text-muted);
             cursor: not-allowed;
-            color: #666;
         }
+
+        /* Buttons */
         .submit-btn {
-            background-color: var(--primary-color);
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 24px;
             font-size: 16px;
-            border-radius: 4px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
-            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
-        .submit-btn:hover { background-color: #004494; }
-        .error-msg {
-            color: var(--danger-color);
+        .submit-btn:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-small {
+            padding: 10px 18px;
             font-size: 14px;
-            display: none;
-            margin-top: 5px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
+        .btn-small:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-admin { background-color: var(--text-muted); }
+        .btn-admin:hover { background-color: #475569; }
+        .btn-excel { background-color: var(--success-color); display: none; }
+        .btn-excel:hover { background-color: var(--success-hover); }
+        .btn-pdf { background-color: var(--danger-color); display: none; }
+        .btn-pdf:hover { background-color: var(--danger-hover); }
 
-        /* Table Styles */
-        .table-responsive {
+        /* Table Design */
+        .table-container {
             overflow-x: auto;
         }
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: #fff;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 900px;
         }
         th, td {
-            border: 1px solid #e0e0e0;
-            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 14px;
             text-align: left;
+            font-size: 14px;
         }
         th {
-            background-color: var(--primary-color);
-            color: white;
-            white-space: nowrap;
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
         }
-        tr:nth-child(even) { background-color: #f9f9f9; }
+        th:hover { background-color: #e2e8f0; color: var(--text-dark); }
+        th::after { content: '\21D5'; margin-left: 6px; opacity: 0.4; font-size: 10px; }
+        tbody tr { transition: background 0.2s; }
+        tbody tr:hover { background-color: #f8fafc; }
         
         .admin-textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             resize: vertical;
-            min-height: 50px;
-            box-sizing: border-box;
-        }
-        .save-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
+            font-family: 'Inter', sans-serif;
             font-size: 13px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 5px;
-            display: block;
-            width: 100%;
         }
-        .save-btn:hover { background-color: #218838; }
-        .pending-text {
-            color: var(--text-light);
-            font-style: italic;
-        }
-
-        /* Search, Sort & Actions Styles */
-        .search-bar {
-            width: 100%;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        .sortable {
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.2s;
-        }
-        .sortable:hover {
-            background-color: #004494;
-        }
-        .sort-icon {
-            font-size: 0.8em;
-            margin-left: 5px;
-            opacity: 0.7;
-        }
+        
+        /* Action Buttons Grid */
         .action-buttons {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
         }
-        .delete-btn {
-            background-color: var(--danger-color);
+        .save-btn { grid-column: span 2; } /* Save button takes full width */
+        
+        .delete-btn, .edit-btn, .save-btn {
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-size: 13px;
-            border-radius: 4px;
+            font-weight: 600;
+            border-radius: 6px;
             cursor: pointer;
-            width: 100%;
+            transition: all 0.2s ease;
         }
-        .delete-btn:hover { background-color: #c82333; }
+        .delete-btn { background-color: var(--danger-color); }
+        .delete-btn:hover { background-color: var(--danger-hover); }
+        .edit-btn { background-color: var(--warning-color); color: #fff; }
+        .edit-btn:hover { background-color: #d97706; }
+        .save-btn { background-color: var(--success-color); }
+        .save-btn:hover { background-color: var(--success-hover); }
+        
+        .pending-text {
+            color: var(--warning-color);
+            font-weight: 600;
+            font-style: italic;
+            background: #fef3c7;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .remark-text {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
 
-        /* Modal Styles */
+        /* Filter Section */
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: #f1f5f9;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+        .filter-group { flex: 1; min-width: 220px; }
+        .filter-group label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+        .search-bar { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+
+        /* Modals */
         .modal-overlay {
+            display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
         }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
         .modal-content {
-            background: white;
+            background: var(--surface-color);
             padding: 30px;
-            border-radius: 8px;
+            border-radius: var(--radius-lg);
             width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-width: 450px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
         }
-        .modal-content h3 { margin-top: 0; }
         .close-modal {
-            float: right;
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 28px;
+            font-weight: 300;
             cursor: pointer;
-            font-size: 20px;
-            color: #888;
+            color: var(--text-muted);
+            transition: color 0.2s;
         }
-        .close-modal:hover { color: #333; }
-
-        /* Confirmation Details Box */
-        .confirm-details {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-            border: 1px solid #eee;
-        }
-        .confirm-details p {
-            margin: 5px 0;
-            font-size: 15px;
-        }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn-cancel {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 50%;
-            font-weight: bold;
-        }
-        .btn-cancel:hover { background-color: #5a6268; }
-        .btn-confirm {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 50%;
-            font-weight: bold;
-        }
-        .btn-confirm:hover { background-color: #004494; }
-
-        /* Toast Notification */
-        .toast-container {
+        .close-modal:hover { color: var(--danger-color); }
+        
+        /* Toast Notifications */
+        #toast-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
+            bottom: 24px; right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .toast {
-            background-color: #333;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            opacity: 0;
+            background-color: var(--text-dark); 
+            color: #fff;
+            padding: 14px 24px; 
+            border-radius: var(--radius-md); 
+            box-shadow: var(--shadow-lg);
+            font-weight: 500;
+            font-size: 14px;
+            opacity: 0; 
             transform: translateY(20px);
-            transition: opacity 0.3s, transform 0.3s;
-            display: none;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-            display: block;
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { border-left: 6px solid var(--success-color); }
+        .toast.error { border-left: 6px solid var(--danger-color); }
+        .toast.info { border-left: 6px solid var(--accent-color); }
+        
+        .data-summary {
+            background: #f8fafc; 
+            padding: 15px; 
+            border-radius: var(--radius-md); 
+            font-size: 14px; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-color);
         }
-        .toast.success { background-color: var(--success-color); }
-        .toast.error { background-color: var(--danger-color); }
+        .data-summary strong { color: var(--text-muted); display: inline-block; width: 120px; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Annapurna Yojna</h1>
-    <div class="header-actions">
-        <button id="exportExcelBtn" class="export-btn" onclick="exportToExcel()">Download Excel</button>
-        <button id="exportPdfBtn" class="export-btn pdf" onclick="exportToPDF()">Download PDF</button>
-        <button id="authBtn" class="admin-login-btn" onclick="openLoginModal()">Admin Login</button>
-    </div>
-</div>
-
-<!-- Toast Notifications -->
-<div class="toast-container" id="toastContainer"></div>
-
 <div class="container">
-    <!-- FORM SECTION -->
-    <div class="card" id="formCard">
-        <h2>Annapurna Yojna Missing list update for SANTURI BLOCK - <br>
-            <span style="color: var(--primary-color); font-size: 0.9em; display: block; margin-top: 8px;">অন্নপূর্ণা যোজনা নাম মিসিং লিস্ট আপডেট</span>
-            <span style="font-size: 0.7em; color: var(--danger-color); font-weight: normal; display: block; margin-top: 5px;">
-                ( * this is survey site only )<br>
-                ( * This is not a govt website )
-            </span>
-        </h2>
-        <p style="color: var(--text-light); margin-bottom: 20px;">For beneficiaries not listed in the July 1, 2026 publication.</p>
-        
+    <div class="header-actions">
+        <button class="btn-small btn-excel" id="btnExportExcel" onclick="exportToExcel()">Download Excel</button>
+        <button class="btn-small btn-pdf" id="btnExportPDF" onclick="exportToPDF()">Download PDF</button>
+        <button class="btn-small btn-admin" onclick="openLoginModal()" id="adminLoginBtn">Admin Login</button>
+    </div>
+
+    <div class="page-header">
+        <h2>Annapurna Yojna Missing list Query for Santuri Raghunathpur-1 ,Raghunathpur Town & Nituria</h2>
+        <div class="subtitle">অন্নপূর্ণা যোজনা নাম মিসিং লিস্ট</div>
+        <div class="disclaimer">
+            * This is a survey site only. <span>* THIS IS NOT A GOVERNMENT WEBSITE.</span>
+        </div>
+    </div>
+
+    <div id="form-section" class="card">
+        <h3>Submit New Application Query</h3>
         <form id="applicationForm">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="submitDate">Application submission date <span style="color:red;">*</span></label>
-                    <input type="date" id="submitDate" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="appId">Application ID <span style="color:red;">*</span></label>
-                    <input type="text" id="appId" required placeholder="Enter unique Application ID">
-                    <div id="idError" class="error-msg">This Application ID already exists!</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="appName">Beneficiary Name <span style="color:red;">*</span></label>
-                    <input type="text" id="appName" required placeholder="Enter full name">
-                </div>
-
-                <div class="form-group">
-                    <label for="panchayat">Panchayat <span style="color:red;">*</span></label>
-                    <select id="panchayat" required>
-                        <option value="">-- Select Panchayat --</option>
-                        <option value="Santuri">Santuri</option>
-                        <option value="RCPur-Kotaldi">RCPur-Kotaldi</option>
-                        <option value="Balitora">Balitora</option>
-                        <option value="Tarabari">Tarabari</option>
-                        <option value="Muradi">Muradi</option>
-                        <option value="Garshika">Garshika</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="block">Block</label>
-                    <input type="text" id="block" value="Santuri" readonly>
-                </div>
+            <div class="form-group">
+                <label for="formDate">Application submission date <span style="color:red;">*</span></label>
+                <input type="date" id="formDate" required>
             </div>
             
-            <button type="submit" class="submit-btn">Submit Query</button>
+            <div class="form-group">
+                <label for="appId">Application ID <span style="color:red;">*</span></label>
+                <input type="text" id="appId" required placeholder="Enter unique Application ID">
+            </div>
+
+            <div class="form-group">
+                <label for="appName">Beneficiary Name <span style="color:red;">*</span></label>
+                <input type="text" id="appName" required placeholder="Enter full name">
+            </div>
+
+            <div class="form-group">
+                <label for="block">Block & Municipality <span style="color:red;">*</span></label>
+                <select id="block" required onchange="handleBlockChange()">
+                    <option value="">-- Select Block & Municipality --</option>
+                    <option value="Santuri">Santuri</option>
+                    <option value="Raghunathpur 1">Raghunathpur 1</option>
+                    <option value="Raghunathpur Town">Raghunathpur Town (Municipality)</option>
+                    <option value="Nituria">Nituria</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="panchayat">Panchayat / Ward <span style="color:red;">*</span></label>
+                <select id="panchayat" required disabled>
+                    <option value="">-- First Select Block & Municipality --</option>
+                </select>
+            </div>
+
+            <button type="button" class="submit-btn" onclick="openConfirmModal()">Submit Query</button>
         </form>
     </div>
 
-    <!-- PUBLIC LIST SECTION -->
-    <div class="card">
-        <h2>Application Status List</h2>
-        <p style="color: var(--text-light); margin-bottom: 15px;">List of all submitted applications and official remarks.</p>
+    <div class="table-container card">
+        <h3>Application Status List</h3>
         
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search by App ID, Name, or Panchayat..." onkeyup="handleSearch()">
+        <div class="filter-row">
+            <div class="filter-group" style="flex: 2;">
+                <label>Search Details</label>
+                <input type="text" id="searchInput" class="search-bar" placeholder="Search by App ID, Name, or Reason..." oninput="renderTable()">
+            </div>
+            <div class="filter-group">
+                <label>Filter Block</label>
+                <select id="filterBlock" class="search-bar" onchange="handleFilterBlockChange()">
+                    <option value="">All Blocks & Municipalities</option>
+                    <option value="Santuri">Santuri</option>
+                    <option value="Raghunathpur 1">Raghunathpur 1</option>
+                    <option value="Raghunathpur Town">Raghunathpur Town</option>
+                    <option value="Nituria">Nituria</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filter Panchayat/Ward</label>
+                <select id="filterPanchayat" class="search-bar" onchange="renderTable()" disabled>
+                    <option value="">All Panchayats/Wards</option>
+                </select>
+            </div>
+        </div>
 
-        <div class="table-responsive">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="sortable" onclick="handleSort('timestamp')">Date <span id="sort_timestamp" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('id')">App ID <span id="sort_id" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('name')">Beneficiary Name <span id="sort_name" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('panchayat')">Panchayat <span id="sort_panchayat" class="sort-icon"></span></th>
-                        <th class="sortable" onclick="handleSort('block')">Block <span id="sort_block" class="sort-icon"></span></th>
-                        <th class="sortable" style="width: 35%;" onclick="handleSort('adminReason')">Admin remark for current status <span id="sort_adminReason" class="sort-icon"></span></th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Data populated via JS -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Confirmation Modal -->
-<div class="modal-overlay" id="confirmModal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeConfirmModal()">&times;</span>
-        <h3 style="color: var(--primary-color);">Confirm Details</h3>
-        <p>Please review your information before submitting:</p>
-        <div class="confirm-details">
-            <p><strong>Date:</strong> <span id="confirmDate"></span></p>
-            <p><strong>App ID:</strong> <span id="confirmId"></span></p>
-            <p><strong>Name:</strong> <span id="confirmName"></span></p>
-            <p><strong>Panchayat:</strong> <span id="confirmPanchayat"></span></p>
-            <p><strong>Block:</strong> <span id="confirmBlock"></span></p>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeConfirmModal()">Edit Details</button>
-            <button class="btn-confirm" id="finalSubmitBtn" onclick="executeSubmission()">Confirm & Submit</button>
-        </div>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th onclick="setSort('formDate')">Date</th>
+                    <th onclick="setSort('id')">App ID</th>
+                    <th onclick="setSort('name')">Beneficiary Name</th>
+                    <th onclick="setSort('block')">Block & Municipality</th>
+                    <th onclick="setSort('panchayat')">Panchayat / Ward</th>
+                    <th onclick="setSort('adminReason')">Admin remark for current status</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="6" style="text-align:center;">Loading database connection...</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -448,55 +467,137 @@
 <div class="modal-overlay" id="loginModal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeLoginModal()">&times;</span>
-        <h3>Admin Login</h3>
+        <h3 style="color: var(--primary-color);">Admin Access</h3>
         <div class="form-group" style="margin-top: 15px;">
-            <label for="adminId">User ID</label>
-            <input type="text" id="adminId" placeholder="Enter Admin ID">
+            <label>User ID</label>
+            <input type="text" id="adminUser" placeholder="Enter User ID">
         </div>
         <div class="form-group">
-            <label for="adminPass">Password</label>
+            <label>Password</label>
             <input type="password" id="adminPass" placeholder="Enter Password">
-            <div id="loginError" class="error-msg">Incorrect ID or Password!</div>
         </div>
         <button class="submit-btn" onclick="attemptLogin()">Login</button>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<!-- Edit Application Modal (Admin Only) -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeEditModal()">&times;</span>
+        <h3 style="color: var(--primary-color);">Edit Application Details</h3>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label>Submission Date</label>
+            <input type="date" id="editDate" required>
+        </div>
+        <div class="form-group">
+            <label>Application ID</label>
+            <input type="text" id="editId" required>
+        </div>
+        <div class="form-group">
+            <label>Beneficiary Name</label>
+            <input type="text" id="editName" required>
+        </div>
+        <div class="form-group">
+            <label>Block & Municipality</label>
+            <select id="editBlock" onchange="handleEditBlockChange()" required>
+                <option value="">-- Select Block & Municipality --</option>
+                <option value="Santuri">Santuri</option>
+                <option value="Raghunathpur 1">Raghunathpur 1</option>
+                <option value="Raghunathpur Town">Raghunathpur Town</option>
+                <option value="Nituria">Nituria</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Panchayat / Ward</label>
+            <select id="editPanchayat" required>
+                <option value="">-- Select Panchayat / Ward --</option>
+            </select>
+        </div>
+        
+        <button class="submit-btn" onclick="saveEdit()">Save Changes</button>
+    </div>
+</div>
 
-    /* =========================================================================
-       1. STATE MANAGEMENT & UI FUNCTIONS (HOISTED FOR SAFETY)
-       These functions are defined first so the UI buttons always work, 
-       even if database connection fails on GitHub.
-       ========================================================================= */
+<!-- Confirm Submission Modal -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeConfirmModal()">&times;</span>
+        <h3 style="color: var(--primary-color);">Confirm Submission</h3>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Please verify your details before submitting:</p>
+        <div class="data-summary">
+            <strong>Date:</strong> <span id="confDate"></span><br>
+            <strong>App ID:</strong> <span id="confId" style="font-weight: 600; color: var(--primary-color);"></span><br>
+            <strong>Name:</strong> <span id="confName"></span><br>
+            <strong>Block:</strong> <span id="confBlock"></span><br>
+            <strong>Panchayat/Ward:</strong> <span id="confPanchayat"></span>
+        </div>
+        <button class="submit-btn" onclick="processSubmission()">Confirm & Submit</button>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal (Admin Only) -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
+        <h3 style="color: var(--danger-color); border-bottom-color: var(--danger-color);">Confirm Deletion</h3>
+        <p style="font-size: 15px; color: var(--text-dark); margin-bottom: 25px;">Are you sure you want to permanently delete this application? This action cannot be undone.</p>
+        <div style="display: flex; gap: 15px;">
+            <button class="submit-btn" style="background: var(--text-muted);" onclick="closeDeleteModal()">Cancel</button>
+            <button class="submit-btn" style="background: var(--danger-color);" id="confirmDeleteBtn">Yes, Delete It</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    // Firebase SDK Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Your specific Firebase configuration
+    const myFirebaseConfig = {
+      apiKey: "AIzaSyCEPlnsWfKqr7akfKXrLE6zJhfBVjdUb3Q",
+      authDomain: "annapurna-bhandar-9d9ae.firebaseapp.com",
+      projectId: "annapurna-bhandar-9d9ae",
+      storageBucket: "annapurna-bhandar-9d9ae.firebasestorage.app",
+      messagingSenderId: "472903565913",
+      appId: "1:472903565913:web:d379e28809fdecbf20e748",
+      measurementId: "G-Y1D3VD5ENN"
+    };
+
+    const app = initializeApp(myFirebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const APP_COLLECTION_PATH = 'annapurna_portal'; 
+
+    // Geographic Data Mapping
+    const locationData = {
+        "Santuri": ["Santuri", "RCPur-Kotaldi", "Balitora", "Tarabari", "Muradi", "Garshika"],
+        "Raghunathpur 1": ["Arrah", "Bero", "Bhutam", "Chorpania", "Khajura", "Nutandi", "Sanka"],
+        "Raghunathpur Town": ["Ward No 1", "Ward No 2", "Ward No 3", "Ward No 4", "Ward No 5", "Ward No 6", "Ward No 7", "Ward No 8", "Ward No 9", "Ward No 10", "Ward No 11", "Ward No 12", "Ward No 13"],
+        "Nituria": ["Bhamuria", "Dishergarh", "Gunjan", "Kalipahari", "Madhukunda", "Parbelia", "Raidih"]
+    };
+
+    // State Variables
     let applications = [];
-    let isAdminLoggedIn = false;
-    let currentSearch = '';
+    let isAdmin = false;
+    let currentUser = null;
     let currentSort = { column: 'timestamp', order: 'desc' };
     let dbReady = false;
+    let currentEditingDbId = null;
+    let currentDeletingDbId = null;
 
-    // Auto-fill the date box with today's date
-    document.addEventListener('DOMContentLoaded', () => {
-        const dateInput = document.getElementById('submitDate');
-        if (dateInput) {
-            // Gets today's date in YYYY-MM-DD format for the input box
-            const today = new Date();
-            // Using offset to get correct local date string
-            const offset = today.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(today - offset)).toISOString().split('T')[0];
-            dateInput.value = localISOTime;
-        }
-    });
-
-    window.showToast = function(message, type = 'success') {
-        const container = document.getElementById('toastContainer');
+    // Toast System
+    window.showToast = function(message, type = 'info') {
+        const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.innerText = message;
         container.appendChild(toast);
+        
         setTimeout(() => toast.classList.add('show'), 10);
         setTimeout(() => {
             toast.classList.remove('show');
@@ -504,64 +605,339 @@
         }, 3000);
     };
 
-    window.openLoginModal = function() {
-        if (isAdminLoggedIn) {
-            isAdminLoggedIn = false;
-            document.getElementById('authBtn').innerText = "Admin Login";
-            document.getElementById('authBtn').classList.remove('logout-btn');
-            document.getElementById('exportExcelBtn').style.display = 'none';
-            document.getElementById('exportPdfBtn').style.display = 'none';
-            document.getElementById('formCard').style.display = 'block';
-            window.showToast("Admin logged out successfully.");
-            window.renderTable();
+    // Initialize Date Field
+    document.addEventListener("DOMContentLoaded", () => {
+        const dateInput = document.getElementById('formDate');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    });
+
+    // Handle Auth
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            dbReady = true;
+            console.log("Database connected anonymously via user:", user.uid);
+            setupRealtimeListener();
         } else {
-            document.getElementById('loginModal').style.display = 'flex';
-            document.getElementById('adminId').value = '';
-            document.getElementById('adminPass').value = '';
-            document.getElementById('loginError').style.display = 'none';
+            console.log("No user signed in. Attempting anonymous auth...");
+            signInAnonymously(auth).catch((error) => {
+                console.error("Anonymous auth failed:", error);
+                window.showToast("CRITICAL: Enable 'Anonymous' sign-in in Firebase Console Auth settings!", "error");
+            });
         }
-    };
+    });
 
-    window.closeLoginModal = function() {
-        document.getElementById('loginModal').style.display = 'none';
-    };
-
-    window.attemptLogin = function() {
-        const pass = document.getElementById('adminPass').value;
-        const userId = document.getElementById('adminId').value.trim();
+    window.handleBlockChange = function() {
+        const blockVal = document.getElementById('block').value;
+        const panchayatSelect = document.getElementById('panchayat');
         
-        if (userId === "") {
-            document.getElementById('loginError').innerText = "User ID cannot be empty.";
-            document.getElementById('loginError').style.display = 'block';
-            return;
+        panchayatSelect.innerHTML = '<option value="">-- Select Panchayat / Ward --</option>';
+        
+        if (blockVal && locationData[blockVal]) {
+            locationData[blockVal].forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                panchayatSelect.appendChild(opt);
+            });
+            panchayatSelect.disabled = false;
+        } else {
+            panchayatSelect.disabled = true;
+        }
+    };
+
+    window.handleFilterBlockChange = function() {
+        const blockVal = document.getElementById('filterBlock').value;
+        const panchayatSelect = document.getElementById('filterFilterPanchayat') || document.getElementById('filterPanchayat');
+        
+        panchayatSelect.innerHTML = '<option value="">All Panchayats/Wards</option>';
+        
+        if (blockVal && locationData[blockVal]) {
+            locationData[blockVal].forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                panchayatSelect.appendChild(opt);
+            });
+            panchayatSelect.disabled = false;
+        } else {
+            panchayatSelect.disabled = true;
+        }
+        window.renderTable();
+    };
+
+    window.openConfirmModal = function() {
+        const date = document.getElementById('formDate').value;
+        const id = document.getElementById('appId').value.trim();
+        const name = document.getElementById('appName').value.trim();
+        const block = document.getElementById('block').value;
+        const panchayat = document.getElementById('panchayat').value;
+
+        if (!date || !id || !name || !block || !panchayat) {
+            return window.showToast("Please fill all required fields", "error");
         }
 
-        if (pass === 'santuri123') {
-            isAdminLoggedIn = true;
-            window.closeLoginModal();
-            document.getElementById('authBtn').innerText = "Logout Admin";
-            document.getElementById('authBtn').classList.add('logout-btn');
-            document.getElementById('exportExcelBtn').style.display = 'inline-block';
-            document.getElementById('exportPdfBtn').style.display = 'inline-block';
-            document.getElementById('formCard').style.display = 'none';
-            window.showToast("Admin logged in successfully!");
-            window.renderTable(); 
-        } else {
-            document.getElementById('loginError').innerText = "Incorrect Password!";
-            document.getElementById('loginError').style.display = 'block';
+        const isDuplicate = applications.some(app => app.id === id);
+        if (isDuplicate) {
+            return window.showToast("This Application ID already exists!", "error");
         }
+
+        document.getElementById('confDate').innerText = date;
+        document.getElementById('confId').innerText = id;
+        document.getElementById('confName').innerText = name;
+        document.getElementById('confBlock').innerText = block;
+        document.getElementById('confPanchayat').innerText = panchayat;
+        
+        document.getElementById('confirmModal').style.display = 'flex';
     };
 
     window.closeConfirmModal = function() {
         document.getElementById('confirmModal').style.display = 'none';
     };
 
-    window.handleSearch = function() {
-        currentSearch = document.getElementById('searchInput').value.toLowerCase();
+    window.processSubmission = async function() {
+        if(!dbReady || !currentUser) return window.showToast("Database connecting... Please wait.", "error");
+
+        const btn = document.querySelector('#confirmModal .submit-btn');
+        btn.disabled = true;
+        btn.innerText = "Saving...";
+
+        const newApp = {
+            id: document.getElementById('appId').value.trim(),
+            name: document.getElementById('appName').value.trim(),
+            block: document.getElementById('block').value,
+            panchayat: document.getElementById('panchayat').value,
+            formDate: document.getElementById('formDate').value,
+            adminReason: '',
+            timestamp: Date.now()
+        };
+
+        try {
+            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', newApp.id);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                window.showToast("Application ID already exists in database!", "error");
+            } else {
+                await setDoc(docRef, newApp);
+                window.showToast("Application submitted successfully!", "success");
+                document.getElementById('applicationForm').reset();
+                document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('panchayat').disabled = true;
+            }
+        } catch (error) {
+            console.error("Error saving doc:", error);
+            window.showToast("Error saving application. Check rules.", "error");
+        }
+        
+        closeConfirmModal();
+        btn.disabled = false;
+        btn.innerText = "Confirm & Submit";
+    };
+
+    window.openLoginModal = function() { document.getElementById('loginModal').style.display = 'flex'; };
+    window.closeLoginModal = function() { document.getElementById('loginModal').style.display = 'none'; };
+
+    window.openEditModal = function(dbId) {
+        const app = applications.find(a => a.dbId === dbId);
+        if(!app) return;
+        currentEditingDbId = dbId;
+        
+        document.getElementById('editDate').value = app.formDate || '';
+        document.getElementById('editId').value = app.id || '';
+        document.getElementById('editName').value = app.name || '';
+        document.getElementById('editBlock').value = app.block || '';
+        
+        // Setup panchayat dropdown
+        const panchayatSelect = document.getElementById('editPanchayat');
+        panchayatSelect.innerHTML = '<option value="">-- Select Panchayat / Ward --</option>';
+        if (app.block && locationData[app.block]) {
+            locationData[app.block].forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                panchayatSelect.appendChild(opt);
+            });
+        }
+        document.getElementById('editPanchayat').value = app.panchayat || '';
+        document.getElementById('editModal').style.display = 'flex';
+    };
+    
+    window.handleEditBlockChange = function() {
+        const blockVal = document.getElementById('editBlock').value;
+        const panchayatSelect = document.getElementById('editPanchayat');
+        panchayatSelect.innerHTML = '<option value="">-- Select Panchayat / Ward --</option>';
+        if (blockVal && locationData[blockVal]) {
+            locationData[blockVal].forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                panchayatSelect.appendChild(opt);
+            });
+        }
+    };
+    window.closeEditModal = function() { document.getElementById('editModal').style.display = 'none'; };
+
+    window.attemptLogin = function() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === 'santuri123') {
+            isAdmin = true;
+            window.showToast("Admin access granted", "success");
+            closeLoginModal();
+            
+            document.getElementById('adminLoginBtn').innerText = 'Logout Admin';
+            document.getElementById('adminLoginBtn').onclick = logoutAdmin;
+            
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('btnExportExcel').style.display = 'inline-block';
+            document.getElementById('btnExportPDF').style.display = 'inline-block';
+            
+            window.renderTable();
+        } else {
+            window.showToast("Invalid Credentials", "error");
+        }
+    };
+
+    window.logoutAdmin = function() {
+        isAdmin = false;
+        window.showToast("Logged out successfully");
+        
+        document.getElementById('adminLoginBtn').innerText = 'Admin Login';
+        document.getElementById('adminLoginBtn').onclick = openLoginModal;
+        
+        document.getElementById('form-section').style.display = 'block';
+        document.getElementById('btnExportExcel').style.display = 'none';
+        document.getElementById('btnExportPDF').style.display = 'none';
+        
         window.renderTable();
     };
 
-    window.handleSort = function(column) {
+    window.saveAdminReason = async function(dbId) {
+        if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
+        const reasonInput = document.getElementById(`reason_${dbId}`);
+        const newReason = reasonInput.value.trim();
+        
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "Saving...";
+        btn.disabled = true;
+
+        try {
+            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId);
+            await updateDoc(docRef, { adminReason: newReason });
+            window.showToast("Remark updated successfully!", "success");
+        } catch (error) {
+            console.error("Error updating doc:", error);
+            window.showToast("Error updating remark", "error");
+        }
+        
+        btn.innerText = originalText;
+        btn.disabled = false;
+    };
+
+    window.openDeleteModal = function(dbId) {
+        currentDeletingDbId = dbId;
+        document.getElementById('deleteModal').style.display = 'flex';
+    };
+
+    window.closeDeleteModal = function() {
+        currentDeletingDbId = null;
+        document.getElementById('deleteModal').style.display = 'none';
+    };
+
+    window.deleteApplication = async function() {
+        if(!currentDeletingDbId) return;
+        if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
+        
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.innerText = "Deleting...";
+        btn.disabled = true;
+
+        try {
+            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', currentDeletingDbId);
+            await deleteDoc(docRef);
+            window.showToast("Application deleted successfully", "success");
+            closeDeleteModal();
+        } catch (error) {
+            console.error("Error deleting doc:", error);
+            window.showToast("Error deleting application", "error");
+        }
+        
+        btn.innerText = "Yes, Delete It";
+        btn.disabled = false;
+    };
+
+    window.saveEdit = async function() {
+        if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
+        
+        const newDate = document.getElementById('editDate').value;
+        const newId = document.getElementById('editId').value.trim();
+        const newName = document.getElementById('editName').value.trim();
+        const newBlock = document.getElementById('editBlock').value;
+        const newPanchayat = document.getElementById('editPanchayat').value;
+        
+        if (!newId || !newName || !newBlock || !newPanchayat || !newDate) {
+            return window.showToast("Please fill all fields", "error");
+        }
+
+        const oldApp = applications.find(a => a.dbId === currentEditingDbId);
+        if (!oldApp) return;
+        
+        try {
+            if (newId !== oldApp.id) {
+                const newDocRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', newId);
+                const docSnap = await getDoc(newDocRef);
+                if (docSnap.exists()) {
+                    return window.showToast("The new Application ID already exists!", "error");
+                }
+                
+                await setDoc(newDocRef, {
+                    id: newId,
+                    name: newName,
+                    panchayat: newPanchayat,
+                    block: newBlock,
+                    formDate: newDate,
+                    adminReason: oldApp.adminReason || '',
+                    timestamp: oldApp.timestamp || Date.now()
+                });
+                
+                const oldDocRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', currentEditingDbId);
+                await deleteDoc(oldDocRef);
+                
+            } else {
+                const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', currentEditingDbId);
+                await updateDoc(docRef, {
+                    name: newName,
+                    panchayat: newPanchayat,
+                    block: newBlock,
+                    formDate: newDate
+                });
+            }
+            
+            window.showToast("Application updated successfully!", "success");
+            window.closeEditModal();
+        } catch(error) {
+            console.error("Error updating application:", error);
+            window.showToast("Error updating application", "error");
+        }
+    };
+
+    function setupRealtimeListener() {
+        const q = query(collection(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications'));
+        
+        onSnapshot(q, (snapshot) => {
+            applications = [];
+            snapshot.forEach((doc) => {
+                applications.push({ dbId: doc.id, ...doc.data() });
+            });
+            window.renderTable();
+        }, (error) => {
+            console.error("Snapshot error:", error);
+        });
+    }
+
+    window.setSort = function(column) {
         if (currentSort.column === column) {
             currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
         } else {
@@ -575,21 +951,27 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
-        document.querySelectorAll('.sort-icon').forEach(el => el.innerHTML = '');
-        const sortIconEl = document.getElementById(`sort_${currentSort.column}`);
-        if (sortIconEl) {
-            sortIconEl.innerHTML = currentSort.order === 'asc' ? ' ▲' : ' ▼';
-        }
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filterBlock = document.getElementById('filterBlock').value;
+        const filterPanchayat = document.getElementById('filterPanchayat').value;
 
+        // Filter data
         let filteredApps = applications.filter(app => {
-            return (app.id && app.id.toLowerCase().includes(currentSearch)) ||
-                   (app.name && app.name.toLowerCase().includes(currentSearch)) ||
-                   (app.panchayat && app.panchayat.toLowerCase().includes(currentSearch));
+            const matchesSearch = 
+                (app.id || '').toLowerCase().includes(searchTerm) ||
+                (app.name || '').toLowerCase().includes(searchTerm);
+            
+            const matchesBlock = filterBlock === "" || app.block === filterBlock;
+            const matchesPanchayat = filterPanchayat === "" || app.panchayat === filterPanchayat;
+            
+            return matchesSearch && matchesBlock && matchesPanchayat;
         });
 
+        // Sort data
         filteredApps.sort((a, b) => {
             let valA = a[currentSort.column] || '';
             let valB = b[currentSort.column] || '';
+            
             if (typeof valA === 'string') valA = valA.toLowerCase();
             if (typeof valB === 'string') valB = valB.toLowerCase();
 
@@ -599,37 +981,38 @@
         });
 
         if (filteredApps.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:#666;">No applications found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No matching applications found.</td></tr>';
             return;
         }
 
-        filteredApps.forEach((app) => {
+        filteredApps.forEach(app => {
             const tr = document.createElement('tr');
-            const submitDate = app.formDate ? new Date(app.formDate).toLocaleDateString('en-IN') : (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A');
+            
             let reasonHTML = '';
-            if (isAdminLoggedIn) {
+            if (isAdmin) {
                 const buttonText = (app.adminReason && app.adminReason.trim() !== '') ? 'Update Remark' : 'Save Remark';
                 reasonHTML = `
                     <textarea id="reason_${app.dbId}" class="admin-textarea" placeholder="Enter admin remark...">${app.adminReason || ''}</textarea>
                     <div class="action-buttons">
                         <button class="save-btn" onclick="saveAdminReason('${app.dbId}')">${buttonText}</button>
-                        <button class="delete-btn" onclick="deleteApplication('${app.dbId}')">Delete</button>
+                        <button class="edit-btn" onclick="openEditModal('${app.dbId}')">Edit</button>
+                        <button class="delete-btn" onclick="openDeleteModal('${app.dbId}')">Delete</button>
                     </div>
                 `;
             } else {
                 if (app.adminReason && app.adminReason.trim() !== '') {
-                    reasonHTML = `<span style="font-weight: 500;">${app.adminReason}</span>`;
+                    reasonHTML = `<span class="remark-text">${app.adminReason}</span>`;
                 } else {
                     reasonHTML = `<span class="pending-text">Pending Admin Review</span>`;
                 }
             }
 
             tr.innerHTML = `
-                <td>${submitDate}</td>
+                <td>${app.formDate || 'N/A'}</td>
                 <td><strong>${app.id}</strong></td>
                 <td>${app.name}</td>
+                <td>${app.block || 'N/A'}</td>
                 <td>${app.panchayat}</td>
-                <td>${app.block}</td>
                 <td>${reasonHTML}</td>
             `;
             tbody.appendChild(tr);
@@ -637,225 +1020,57 @@
     };
 
     window.exportToExcel = function() {
-        if(applications.length === 0) return window.showToast("No data to export", "error");
-        const data = applications.map(app => ({
-            "Date": app.formDate ? new Date(app.formDate).toLocaleDateString('en-IN') : (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A'),
+        if (!applications || applications.length === 0) return window.showToast("No data to export", "error");
+        
+        const exportData = applications.map(app => ({
+            "Submission Date": app.formDate || "N/A",
             "Application ID": app.id,
             "Beneficiary Name": app.name,
-            "Panchayat": app.panchayat,
-            "Block": app.block,
-            "Admin Remark": app.adminReason || "Pending Admin Review"
+            "Block & Municipality": app.block || "N/A",
+            "Panchayat / Ward": app.panchayat,
+            "Admin Remark": app.adminReason || "Pending"
         }));
-        const ws = XLSX.utils.json_to_sheet(data);
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Applications");
-        XLSX.writeFile(wb, "Annapurna_Yojna_List.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Annapurna Yojna");
+        XLSX.writeFile(wb, "Annapurna_Yojna_Missing_List.xlsx");
     };
 
     window.exportToPDF = function() {
-        if(applications.length === 0) return window.showToast("No data to export", "error");
+        if (!applications || applications.length === 0) return window.showToast("No data to export", "error");
+        
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("Annapurna Yojna Missing List - Santuri Block", 14, 15);
-        const tableColumn = ["Date", "App ID", "Beneficiary Name", "Panchayat", "Block", "Admin Remark"];
-        const tableRows = applications.map(app => [
-            app.formDate ? new Date(app.formDate).toLocaleDateString('en-IN') : (app.timestamp ? new Date(app.timestamp).toLocaleDateString('en-IN') : 'N/A'), app.id, app.name, app.panchayat, app.block, app.adminReason || "Pending Admin Review"
-        ]);
-        doc.autoTable({
-            head: [tableColumn], body: tableRows, startY: 20, styles: { fontSize: 9 }, headStyles: { fillColor: [0, 86, 179] }
+        const doc = new jsPDF('landscape');
+        
+        doc.setFontSize(16);
+        doc.text("Annapurna Yojna - Missing List Status", 14, 15);
+        
+        const tableColumn = ["Date", "App ID", "Beneficiary Name", "Block", "Panchayat/Ward", "Admin Remark"];
+        const tableRows = [];
+
+        applications.forEach(app => {
+            const rowData = [
+                app.formDate || "N/A",
+                app.id,
+                app.name,
+                app.block || "N/A",
+                app.panchayat,
+                app.adminReason || "Pending"
+            ];
+            tableRows.push(rowData);
         });
-        doc.save("Annapurna_Yojna_List.pdf");
-    };
 
-    /* =========================================================================
-       2. DATABASE INITIALIZATION (FIREBASE SAFE SETUP)
-       ========================================================================= */
-    const APP_COLLECTION_PATH = typeof __app_id !== 'undefined' ? __app_id : 'annapurna-yojna-portal';
-    
-    // NOTE FOR GITHUB: If you host this on GitHub, the default DB config is missing.
-    // If you want data to save to a cloud database, create a Firebase project,
-    // and paste the configuration keys into the empty strings below:
-    const myFirebaseConfig = {
-        apiKey: "AIzaSyCEPlnsWfKqr7akfKXrLE6zJhfBVjdUb3Q",
-        authDomain: "annapurna-bhandar-9d9ae.firebaseapp.com",
-        projectId: "annapurna-bhandar-9d9ae",
-        storageBucket: "annapurna-bhandar-9d9ae.firebasestorage.app",
-        messagingSenderId: "472903565913",
-        appId: "1:472903565913:web:d379e28809fdecbf20e748",
-        measurementId: "G-Y1D3VD5ENN"
-    };
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 25,
+            theme: 'grid',
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [0, 86, 179] }
+        });
 
-    let actualFirebaseConfig = {};
-    if (typeof __firebase_config !== 'undefined') {
-        try { actualFirebaseConfig = JSON.parse(__firebase_config); } catch(e) {}
-    } else if (myFirebaseConfig.apiKey !== "") {
-        actualFirebaseConfig = myFirebaseConfig;
-    }
-
-    let app, auth, db, currentUser = null;
-    
-    if (Object.keys(actualFirebaseConfig).length > 0) {
-        try {
-            app = initializeApp(actualFirebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            dbReady = true;
-            initDatabase();
-        } catch(e) {
-            console.error("Firebase init failed:", e);
-        }
-    } else {
-        console.warn("No Firebase configuration found! Data will not be saved. Add config keys if running outside the preview environment.");
-        setTimeout(() => window.showToast("Warning: No database connected. Cloud features offline.", "error"), 1500);
-        window.renderTable();
-    }
-
-    async function initDatabase() {
-        try {
-            let userCred;
-            if (typeof __initial_auth_token !== 'undefined') {
-                userCred = await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                userCred = await signInAnonymously(auth);
-            }
-            
-            currentUser = userCred.user;
-            if (!currentUser) return; // Wait for authentication before proceeding
-
-            const appsRef = collection(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications');
-            onSnapshot(appsRef, (snapshot) => {
-                applications = [];
-                snapshot.forEach(docSnap => {
-                    applications.push({ dbId: docSnap.id, ...docSnap.data() });
-                });
-                applications.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                window.renderTable();
-            }, (error) => {
-                console.error("Firestore sync error:", error);
-            });
-        } catch (error) {
-            console.error("Auth error:", error);
-            if (error.code === 'auth/operation-not-allowed') {
-                setTimeout(() => window.showToast("CRITICAL: Enable 'Anonymous' sign-in in Firebase Console -> Authentication", "error"), 2000);
-            } else {
-                setTimeout(() => window.showToast("Auth Error: " + error.message, "error"), 2000);
-            }
-        }
-    }
-
-    /* =========================================================================
-       3. DATABASE WRITE OPERATIONS
-       ========================================================================= */
-    document.getElementById('applicationForm').onsubmit = async function(e) {
-        e.preventDefault();
-        
-        if (!dbReady) {
-            window.showToast("Error: Database configuration is missing or invalid.", "error");
-            return;
-        }
-        if (!currentUser) {
-            window.showToast("Error: Authentication failed. Please check Firebase Anonymous Sign-in.", "error");
-            return;
-        }
-        
-        const appIdInput = document.getElementById('appId').value.trim();
-        const appName = document.getElementById('appName').value.trim();
-        const panchayat = document.getElementById('panchayat').value;
-        const block = document.getElementById('block').value;
-        const submitDate = document.getElementById('submitDate').value;
-
-        try {
-            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', appIdInput);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                document.getElementById('idError').style.display = 'block';
-                window.showToast("Application ID already exists!", "error");
-                return;
-            }
-            document.getElementById('idError').style.display = 'none';
-            
-            document.getElementById('confirmDate').innerText = new Date(submitDate).toLocaleDateString('en-IN');
-            document.getElementById('confirmId').innerText = appIdInput;
-            document.getElementById('confirmName').innerText = appName;
-            document.getElementById('confirmPanchayat').innerText = panchayat;
-            document.getElementById('confirmBlock').innerText = block;
-            document.getElementById('confirmModal').style.display = 'flex';
-        } catch (error) {
-            console.error("Error checking ID:", error);
-            window.showToast("Error validating Application ID", "error");
-        }
-    };
-
-    window.executeSubmission = async function() {
-        if (!currentUser) return; // Prevent action if not authenticated
-        const appIdInput = document.getElementById('appId').value.trim();
-        const appName = document.getElementById('appName').value.trim();
-        const panchayat = document.getElementById('panchayat').value;
-        const block = document.getElementById('block').value;
-        const submitDate = document.getElementById('submitDate').value;
-        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
-        
-        finalSubmitBtn.disabled = true;
-        finalSubmitBtn.innerText = "Saving...";
-
-        try {
-            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', appIdInput);
-            await setDoc(docRef, {
-                id: appIdInput,
-                name: appName,
-                panchayat: panchayat,
-                block: block,
-                formDate: submitDate,
-                adminReason: '', 
-                timestamp: Date.now()
-            });
-            window.showToast("Application submitted successfully!");
-            document.getElementById('applicationForm').reset();
-            
-            // Re-apply today's date since reset clears it
-            const today = new Date();
-            const offset = today.getTimezoneOffset() * 60000;
-            document.getElementById('submitDate').value = (new Date(today - offset)).toISOString().split('T')[0];
-
-            window.closeConfirmModal();
-        } catch (error) {
-            console.error("Submission error:", error);
-            window.showToast("Failed to submit application", "error");
-        } finally {
-            finalSubmitBtn.disabled = false;
-            finalSubmitBtn.innerText = "Confirm & Submit";
-        }
-    };
-
-    window.saveAdminReason = async function(dbId) {
-        if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
-        const appData = applications.find(a => a.dbId === dbId);
-        if(!appData) return;
-        
-        const reasonValue = document.getElementById(`reason_${dbId}`).value;
-        const isUpdate = (appData.adminReason && appData.adminReason.trim() !== '');
-        
-        try {
-            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId);
-            await updateDoc(docRef, { adminReason: reasonValue });
-            const actionWord = isUpdate ? 'updated' : 'saved';
-            window.showToast(`Remark ${actionWord} for Application ID: ${appData.id}`);
-        } catch (error) {
-            console.error("Error updating doc:", error);
-            window.showToast("Error updating remark", "error");
-        }
-    };
-
-    window.deleteApplication = async function(dbId) {
-        if(!dbReady || !currentUser) return window.showToast("Database not connected", "error");
-        try {
-            const docRef = doc(db, 'artifacts', APP_COLLECTION_PATH, 'public', 'data', 'applications', dbId);
-            await deleteDoc(docRef);
-            window.showToast("Application deleted successfully", "success");
-        } catch (error) {
-            console.error("Error deleting doc:", error);
-            window.showToast("Error deleting application", "error");
-        }
+        doc.save('Annapurna_Yojna_Missing_List.pdf');
     };
 </script>
 
