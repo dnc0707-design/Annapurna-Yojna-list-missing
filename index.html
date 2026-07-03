@@ -262,6 +262,46 @@
         }
         .close-modal:hover { color: #333; }
 
+        /* Confirmation Details Box */
+        .confirm-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 1px solid #eee;
+        }
+        .confirm-details p {
+            margin: 5px 0;
+            font-size: 15px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 50%;
+            font-weight: bold;
+        }
+        .btn-cancel:hover { background-color: #5a6268; }
+        .btn-confirm {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 50%;
+            font-weight: bold;
+        }
+        .btn-confirm:hover { background-color: #004494; }
+
         /* Toast Notification */
         .toast-container {
             position: fixed;
@@ -306,7 +346,7 @@
 
 <div class="container">
     <!-- FORM SECTION -->
-    <div class="card">
+    <div class="card" id="formCard">
         <h2>Annapurna Bhandar Missing list update for SANTURI BLOCK - <br>
             <span style="font-size: 0.7em; color: var(--danger-color); font-weight: normal;">
                 ( * this is survey site only )<br>
@@ -375,6 +415,25 @@
                     <!-- Data populated via JS -->
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeConfirmModal()">&times;</span>
+        <h3 style="color: var(--primary-color);">Confirm Details</h3>
+        <p>Please review your information before submitting:</p>
+        <div class="confirm-details">
+            <p><strong>App ID:</strong> <span id="confirmId"></span></p>
+            <p><strong>Name:</strong> <span id="confirmName"></span></p>
+            <p><strong>Panchayat:</strong> <span id="confirmPanchayat"></span></p>
+            <p><strong>Block:</strong> <span id="confirmBlock"></span></p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Edit Details</button>
+            <button class="btn-confirm" id="finalSubmitBtn" onclick="executeSubmission()">Confirm & Submit</button>
         </div>
     </div>
 </div>
@@ -469,6 +528,9 @@
             document.getElementById('exportExcelBtn').style.display = 'none';
             document.getElementById('exportPdfBtn').style.display = 'none';
             
+            // Show form when admin logs out
+            document.getElementById('formCard').style.display = 'block';
+            
             window.showToast("Admin logged out successfully.");
             window.renderTable();
         } else {
@@ -502,6 +564,9 @@
             document.getElementById('exportExcelBtn').style.display = 'inline-block';
             document.getElementById('exportPdfBtn').style.display = 'inline-block';
 
+            // Hide form when admin logs in
+            document.getElementById('formCard').style.display = 'none';
+
             window.showToast("Admin logged in successfully!");
             window.renderTable(); 
         } else {
@@ -510,6 +575,7 @@
         }
     };
 
+    // Form Submission Flow - Step 1: Show Confirmation Modal
     document.getElementById('applicationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         if (!auth.currentUser) {
@@ -522,42 +588,71 @@
         const panchayat = document.getElementById('panchayat').value;
         const block = document.getElementById('block').value;
 
-        const submitBtn = this.querySelector('.submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting...";
-
+        // Pre-check for duplicate ID before showing confirmation
+        const docRef = doc(db, 'artifacts', FIREBASE_APP_ID, 'public', 'data', 'applications', appIdInput);
         try {
-            // Check for duplicate Application ID directly in the database
-            const docRef = doc(db, 'artifacts', FIREBASE_APP_ID, 'public', 'data', 'applications', appIdInput);
             const docSnap = await getDoc(docRef);
-            
             if (docSnap.exists()) {
                 document.getElementById('idError').style.display = 'block';
                 window.showToast("Application ID already exists!", "error");
-            } else {
-                document.getElementById('idError').style.display = 'none';
-                
-                // Save new application
-                await setDoc(docRef, {
-                    id: appIdInput,
-                    name: appName,
-                    panchayat: panchayat,
-                    block: block,
-                    adminReason: '', 
-                    timestamp: Date.now()
-                });
-                
-                window.showToast("Application submitted successfully!");
-                this.reset();
+                return;
             }
+            document.getElementById('idError').style.display = 'none';
+            
+            // Populate and show confirmation modal
+            document.getElementById('confirmId').innerText = appIdInput;
+            document.getElementById('confirmName').innerText = appName;
+            document.getElementById('confirmPanchayat').innerText = panchayat;
+            document.getElementById('confirmBlock').innerText = block;
+            
+            document.getElementById('confirmModal').style.display = 'flex';
+
+        } catch (error) {
+            console.error("Error checking ID:", error);
+            window.showToast("Error validating Application ID", "error");
+        }
+    });
+
+    window.closeConfirmModal = function() {
+        document.getElementById('confirmModal').style.display = 'none';
+    };
+
+    // Form Submission Flow - Step 2: Actually Submit Data
+    window.executeSubmission = async function() {
+        const appIdInput = document.getElementById('appId').value.trim();
+        const appName = document.getElementById('appName').value.trim();
+        const panchayat = document.getElementById('panchayat').value;
+        const block = document.getElementById('block').value;
+
+        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+        finalSubmitBtn.disabled = true;
+        finalSubmitBtn.innerText = "Saving...";
+
+        try {
+            const docRef = doc(db, 'artifacts', FIREBASE_APP_ID, 'public', 'data', 'applications', appIdInput);
+            
+            // Save new application
+            await setDoc(docRef, {
+                id: appIdInput,
+                name: appName,
+                panchayat: panchayat,
+                block: block,
+                adminReason: '', 
+                timestamp: Date.now()
+            });
+            
+            window.showToast("Application submitted successfully!");
+            document.getElementById('applicationForm').reset();
+            window.closeConfirmModal();
+            
         } catch (error) {
             console.error("Submission error:", error);
             window.showToast("Failed to submit application", "error");
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Application";
+            finalSubmitBtn.disabled = false;
+            finalSubmitBtn.innerText = "Confirm & Submit";
         }
-    });
+    };
 
     window.handleSearch = function() {
         currentSearch = document.getElementById('searchInput').value.toLowerCase();
